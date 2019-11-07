@@ -19,7 +19,6 @@ module VGA_SRAM_interface (
    input  logic            Resetn,
    
    input  logic            VGA_enable,
-   input  logic            VGA_adjust,
    input  logic   [17:0]   SRAM_base_address,
    output logic   [17:0]   SRAM_address,
    input  logic   [15:0]   SRAM_read_data,
@@ -44,9 +43,6 @@ VGA_SRAM_state_type VGA_SRAM_state;
 
 // For VGA
 logic    [9:0]    VGA_red, VGA_green, VGA_blue;
-logic    [9:0]   VGA_red_old, VGA_green_old, VGA_blue_old;
-logic    [9:0]   VGA_red_new, VGA_green_new, VGA_blue_new;
-logic    [10:0]   Result_red, Result_green, Result_blue;
 logic    [9:0]    pixel_X_pos;
 logic    [9:0]    pixel_Y_pos;
 
@@ -74,20 +70,12 @@ VGA_Controller VGA_unit(
 	.oVGA_CLOCK(VGA_CLOCK_O)
 );
 
-assign Result_red = {1'b0, VGA_red_old} + {1'b0, VGA_red_new};
-assign Result_green = {1'b0, VGA_green_old} + {1'b0, VGA_green_new};
-assign Result_blue = {1'b0, VGA_blue_old} + {1'b0, VGA_blue_new};
-
 always_ff @ (posedge Clock or negedge Resetn) begin
 	if (Resetn == 1'b0) begin
 		VGA_SRAM_state <= S_VS_WAIT_NEW_PIXEL_ROW;
 		VGA_red <= 10'd0;
 		VGA_green <= 10'd0;
-		VGA_blue <= 10'd0;
-
-		VGA_red_old <= 11'd0;
-		VGA_green_old <= 11'd0;
-		VGA_blue_old <= 11'd0;
+		VGA_blue <= 10'd0;	
 		
 		SRAM_address <= 18'd0;
 		
@@ -98,11 +86,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 		if (~VGA_enable) begin
 			VGA_red <= 10'd0;
  			VGA_green <= 10'd0;
-	   		VGA_blue <= 10'd0;	
-
-			VGA_red_old <= 10'd0;
-			VGA_green_old <= 10'd0;
-			VGA_blue_old <= 10'd0;							
+	   		VGA_blue <= 10'd0;								
 		end else begin
 			case (VGA_SRAM_state)
 			S_VS_WAIT_NEW_PIXEL_ROW: begin
@@ -123,11 +107,7 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				
 				VGA_red <= 10'd0;
 				VGA_green <= 10'd0;
-				VGA_blue <= 10'd0;
-
-				VGA_red_old <= 11'd0;
-				VGA_green_old <= 11'd0;
-				VGA_blue_old <= 11'd0;								
+				VGA_blue <= 10'd0;								
 			end
 			S_VS_NEW_PIXEL_ROW_DELAY_1: begin	
 				// Provide address for data 2
@@ -167,24 +147,11 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				// Provide address for data 3
 				SRAM_address <= SRAM_address + 18'h00001;
 						
-				// Provide RGB data			
-				if (pixel_X_pos != VIEW_AREA_LEFT && VGA_adjust == 1'b1) begin
-					// Adjust RGB data
-				end else begin
-					
-					VGA_red_old <= VGA_red_new;
-					VGA_green_old <= VGA_green_new;
-					VGA_blue_old <= VGA_blue_new;
-
-					VGA_red_new <= {VGA_sram_data[2][15:8], 2'b00};
-					VGA_green_new <= {VGA_sram_data[2][7:0], 2'b00};
-					VGA_blue_new <= {VGA_sram_data[1][15:8], 2'b00};	
-
-					VGA_red <= Result_red[10:1];
-					VGA_green <= Result_green[10:1];
-					VGA_blue <= Result_blue[10:1];
-				end
-								
+				// Provide RGB data
+				VGA_red <= {VGA_sram_data[2][15:8], 2'b00};
+				VGA_green <= {VGA_sram_data[2][7:0], 2'b00};
+				VGA_blue <= {VGA_sram_data[1][15:8], 2'b00};			
+				
 				VGA_SRAM_state <= S_VS_FETCH_PIXEL_DATA_1;			
 			end
 			S_VS_FETCH_PIXEL_DATA_1: begin		
@@ -201,21 +168,9 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 				VGA_sram_data[1] <= SRAM_read_data;
 				
 				// Provide RGB data
-				if (VGA_adjust == 1'b1) begin
-					// Adjust RGB data
-				end else begin
-					VGA_red_old <= VGA_red_new;
-					VGA_green_old <= VGA_green_new;
-					VGA_blue_old <= VGA_blue_new;
-					
-					VGA_red_new <= {VGA_sram_data[1][7:0], 2'b00};
-					VGA_green_new <= {VGA_sram_data[0][15:8], 2'b00};
-					VGA_blue_new <= {VGA_sram_data[0][7:0], 2'b00};	
-
-					VGA_red <= Result_red[10:1];
-					VGA_green <= Result_green[10:1];
-					VGA_blue <= Result_blue[10:1];
-				end
+				VGA_red <= {VGA_sram_data[1][7:0], 2'b00};
+				VGA_green <= {VGA_sram_data[0][15:8], 2'b00};
+				VGA_blue <= {VGA_sram_data[0][7:0], 2'b00};
 				
 				VGA_SRAM_state <= S_VS_FETCH_PIXEL_DATA_3;
 			end
