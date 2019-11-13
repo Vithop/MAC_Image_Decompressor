@@ -65,38 +65,42 @@ always @(posedge Clock or negedge Resetn) begin
 		// reset
 		SRAM_we_n <= 1'b0;
 		SRAM_write_data <= 16'd0;
-		SRAM_address <= 18'd0;
+		SRAM_address <= 16'd0;
 		read_UV_flag = 1'b0;
 		J <= 16'd0;
-		M1_state <= S_M1_LI_FIRST_READ_V;
+		M1_state <= S_M1_IDLE;
 	end	else begin
 		case(M1_state)
 			S_M1_IDLE:begin
 				if (Enable == 1'b1) begin
-					M1_state <= nextstate;
+					M1_state <= S_M1_LI_FIRST_READ_V;
+					SRAM_address <= intit_V_address;
 				end
 				
 			end
 			S_M1_LI_FIRST_READ_V:begin
-				SRAM_address = intit_V_address;
+				SRAM_address = intit_U_address;
 				SRAM_we_n <= 1'b0;
 				J <= 16'd0;
 				M1_state <= S_M1_LI_FIRST_READ_U;
 
 			end
 			S_M1_LI_FIRST_READ_U:begin
-				SRAM_address = intit_U_address;
-				SRAM_we_n <= 1'b0;
+				SRAM_address = intit_Y_address;
 				J <= 16'd0;
 				M1_state <= S_M1_LI_FIRST_READ_Y;
 			end
 			S_M1_LI_FIRST_READ_Y:begin
-				SRAM_address = intit_Y_address;
-				SRAM_we_n <= 1'b0;
+				V <= V + 1'd1;
+				SRAM_address = intit_V_address + V;
+
 				J <= 16'd0;
 				M1_state <= S_M1_LI_V1;
 			end
 			S_M1_LI_V1:begin
+				U <= U + 1'd1;
+				SRAM_address = intit_U_address + U;
+
 				V_prime_even <= [15:8]SRAM_read_data;
 				V_buffer[5] <= [7:0]SRAM_read_data;
 				V_buffer[4] <= V_prime_even;
