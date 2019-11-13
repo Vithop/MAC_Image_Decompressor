@@ -39,11 +39,14 @@ typedef enum logic [3:0] {
 
 typedef enum logic [3:0]{
 	//lEAD IN STATES
-	S_M1_LI_FIRST_READ,
+	S_M1_LI_FIRST_READ_V,
+	S_M1_LI_FIRST_READ_U,
+	S_M1_LI_FIRST_READ_Y,
 	S_M1_LI_V1,
 	S_M1_LI_U1,
 	S_M1_LI_Y1,
 	S_M1_LI_CALC_V,
+	S_M1_LI_CALC_U,
 	//REPEATING STATES
 	S_M1_IDLE,
 	S_M1_CALC_V_PRIME,

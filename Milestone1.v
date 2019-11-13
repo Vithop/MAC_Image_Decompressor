@@ -11,7 +11,7 @@ module Milestone1 (
 	   input  	logic	      	Resetn,
 	   input  	logic	      	Enable,
 	 
-	   input  	logic	[17:0]	SRAM_base_address,
+	   // input  	logic	[17:0]	SRAM_base_address,
 	   output 	logic	[17:0]	SRAM_address,
 	   input  	logic	[15:0]	SRAM_read_data,
 	   output 	logic	[15:0]	SRAM_write_data,
@@ -38,25 +38,37 @@ logic [15:0] Y;
 logic [15:0] U;
 logic [15:0] V;
 
-logic [15:0] U_prime;
+//address base values const
+parameter intit_Y_address = 18'd0,
+		intit_U_address = 18'd38400,
+		intit_V_address = 18'd57600
+		init_RGB_address = 146944;
+
+logic [15:0] U_prime_even;
+logic [15:0] U_prime_odd;
+// U/V_buffer[5] is (j+5)/2
 logic [15:0] U_buffer [5:0]
-logic [15:0] V_prime;
+logic [15:0] V_prime_even;
+logic [15:0] V_prime_odd;
 logic [15:0] V_buffer [5:0]
-logic read_UV;
+logic read_UV_flag;
+logic [15:0] Y_prime [1:0]
 
 //RGB Values
 logic [7:0] R;
 logic [7:0] G;
 logic [7:0] B;
 logic [7:0] B_buffer;
+
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		// reset
-		SRAM_we_n <= 1'b1;
+		SRAM_we_n <= 1'b0;
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 18'd0;
-		read_UV = 1'b1;
+		read_UV_flag = 1'b0;
 		J <= 16'd0;
+		M1_state <= S_M1_LI_FIRST_READ_V;
 	end	else begin
 		case(M1_state)
 			S_M1_IDLE:begin
@@ -64,6 +76,71 @@ always @(posedge Clock or negedge Resetn) begin
 					M1_state <= nextstate;
 				end
 				
+			end
+			S_M1_LI_FIRST_READ_V:begin
+				SRAM_address = intit_V_address;
+				SRAM_we_n <= 1'b0;
+				J <= 16'd0;
+				M1_state <= S_M1_LI_FIRST_READ_U;
+
+			end
+			S_M1_LI_FIRST_READ_U:begin
+				SRAM_address = intit_U_address;
+				SRAM_we_n <= 1'b0;
+				J <= 16'd0;
+				M1_state <= S_M1_LI_FIRST_READ_Y;
+			end
+			S_M1_LI_FIRST_READ_Y:begin
+				SRAM_address = intit_Y_address;
+				SRAM_we_n <= 1'b0;
+				J <= 16'd0;
+				M1_state <= S_M1_LI_V1;
+			end
+			S_M1_LI_V1:begin
+				V_prime_even <= [15:8]SRAM_read_data;
+				V_buffer[5] <= [7:0]SRAM_read_data;
+				V_buffer[4] <= V_prime_even;
+				V_buffer[3] <= V_prime_even;
+				V_buffer[2] <= V_prime_even;
+				V_buffer[1] <= V_prime_even;
+				V_buffer[0] <= V_prime_even;
+				M1_state <= S_M1_LI_U1;
+			end
+			S_M1_LI_U1:begin
+				U_prime_even <= [15:8]SRAM_read_data;
+				U_buffer[5] <= [7:0]SRAM_read_data;
+				U_buffer[4] <= U_prime_even;
+				U_buffer[3] <= U_prime_even;
+				U_buffer[2] <= U_prime_even;
+				U_buffer[1] <= U_prime_even;
+				U_buffer[0] <= U_prime_even;
+				M1_state <= S_M1_LI_Y1;
+			end
+			S_M1_LI_Y1	:begin
+				Y_prime <= SRAM_read_data;
+				M1_state <= S_M1_LI_CALC_V;
+			end
+			S_M1_LI_CALC_V:begin
+				V_buffer[5] <= [7:0]SRAM_read_data;
+				V_buffer[4] <= [15:8]SRAM_read_data;
+				V_buffer[3] <= V_buffer[5];
+				V_buffer[2] <= V_buffer[4];
+				V_buffer[1] <= V_buffer[3];
+				V_buffer[0] <= V_buffer[2];
+				// vithuran is a slow poke and so this
+				//is a placehorder for a calculation
+				M1_state <= S_M1_LI_CALC_U;
+			end
+			S_M1_LI_CALC_U:begin
+				U_buffer[5] <= [7:0]SRAM_read_data;
+				U_buffer[4] <= [15:8]SRAM_read_data;
+				U_buffer[3] <= U_buffer[5];
+				U_buffer[2] <= U_buffer[4];
+				U_buffer[1] <= U_buffer[3];
+				U_buffer[0] <= U_buffer[2];
+				// vithuran is a slow poke and so this
+				//is a placehorder for a calculation
+				M1_state <= S_M1_CALC_FIRST_RB;
 			end
 			S_M1_CALC_V_PRIME:begin
 				M1_state <= S_M1_CALC_U_PRIME;
