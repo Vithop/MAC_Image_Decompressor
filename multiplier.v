@@ -5,16 +5,19 @@
 `default_nettype none
 `endif
 
-module multiplier (
-	input logic [31:0] a,
+module multiplier (	
+	output logic [31:0] a
 	input logic [31:0] b,
-	output logic [63:0] c
+	input logic [31:0] c,
+	
+	output logic [31:0] d,
+	input logic [31:0] e,
+	input logic [31:0] f,
+
+	output logic [31:0] g,
+	input logic [31:0] h,
+	input logic [31:0] i,
 );
 
-always_comb begin
-	case()
-		
-	endcase
-end
 	
 endmodule
