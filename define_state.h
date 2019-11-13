@@ -38,22 +38,25 @@ typedef enum logic [3:0] {
 } VGA_SRAM_state_type;
 
 typedef enum logic [3:0]{
+	//lEAD IN STATES
+	S_M1_LI_FIRST_READ,
+	S_M1_LI_V1,
+	S_M1_LI_U1,
+	S_M1_LI_Y1,
+	S_M1_LI_CALC_V,
+	//REPEATING STATES
 	S_M1_IDLE,
 	S_M1_CALC_V_PRIME,
 	S_M1_CALC_U_PRIME,
 	S_M1_CALC_FIRST_RB,
 	S_M1_CALC_FIRST_G,
 	S_M1_CALC_SECOND_RB,
-	S_M1_CALC_SECOND_G
+	S_M1_CALC_SECOND_G,
 	// S_M1_
 	// S_M1_
 	// S_M1_
 	// S_M1_
-	// S_M1_
-	// S_M1_
-	// S_M1_
-	// S_M1_
-	// S_M1_
+	//LEAD OUT STATES
 } Milestone1_state_type;
 /*
 typedef enum logic [3:0]{
