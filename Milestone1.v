@@ -20,29 +20,32 @@ module Milestone1 (
 );
 
 Milestone1_state_type M1_state;
-// For Multiplier
-logic [1:0]	 MAC_selctor;
-logic [31:0] result_a;
-logic [31:0] in_b;	
-logic [31:0] in_c;
-logic [31:0] result_d;
-logic [31:0] in_e;
-logic [31:0] in_f;
-logic [31:0] result_g;
-logic [31:0] in_h;
-logic [31:0] in_i;
-
-//For Calculating YUV values
-logic [16:0] J; // Pixel Position
-logic [15:0] Y;
-logic [15:0] U;
-logic [15:0] V;
 
 //address base values const
 parameter intit_Y_address = 18'd0,
 		intit_U_address = 18'd38400,
 		intit_V_address = 18'd57600
 		init_RGB_address = 146944;
+
+// For Multiplier
+logic [31:0] result_a;
+logic [31:0] result_b;
+logic [31:0] result_c;
+
+logic [31:0] Op1;
+logic [31:0] Op2;
+
+logic [31:0] Op3;
+logic [31:0] Op4;
+
+logic [31:0] Op5;
+logic [31:0] Op6;
+
+//For Calculating YUV values
+logic [16:0] J; // Pixel Position
+logic [15:0] Y;
+logic [15:0] U;
+logic [15:0] V;
 
 logic [15:0] U_prime_even;
 logic [15:0] U_prime_odd;
@@ -59,6 +62,11 @@ logic [7:0] R;
 logic [7:0] G;
 logic [7:0] B;
 logic [7:0] B_buffer;
+
+assign result_a = [31:0](Op1 * Op2) ;
+assign result_b = [31:0](Op3 * Op4) ;
+assign result_c = [31:0](Op5 * Op6) ;
+
 
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
@@ -169,14 +177,7 @@ always @(posedge Clock or negedge Resetn) begin
 		endcase
 	end
 end
-MAC MAC_unit(
-	.a(result_a),
-	.b(in_b;),
-	.c(in_c),
-	.d(result_d),
-	.e(in_e),
-	.f(in_f),
-	.g(result_g),
-	.h(in_h),
-	.i(in_i)
-);
+
+endmodule
+
+
