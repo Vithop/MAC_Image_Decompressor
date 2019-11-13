@@ -9,7 +9,7 @@
 module Milestone1 (
 	   input  	logic	      	Clock,
 	   input  	logic	      	Resetn,
-	   input  	logic	      	M1_enable,
+	   input  	logic	      	Enable,
 	 
 	   input  	logic	[17:0]	SRAM_base_address,
 	   output 	logic	[17:0]	SRAM_address,
@@ -19,6 +19,7 @@ module Milestone1 (
 
 );
 
+Milestone1_state_type M1_state;
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] in_b;	
@@ -40,6 +41,7 @@ logic [15:0] U_prime;
 logic [15:0] U_buffer [5:0]
 logic [15:0] V_prime;
 logic [15:0] V_buffer [5:0]
+logic read_UV;
 
 //RGB Values
 logic [7:0] R;
@@ -52,12 +54,37 @@ always @(posedge Clock or negedge Resetn) begin
 		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 18'd0;
-
+		read_UV = 1'b1;
 		J <= 16'd0;
 	end	else begin
-		if (M1_enable) begin
-			
-		end
+		case(M1_state)
+			S_M1_IDLE:begin
+				if (Enable == 1'b1) begin
+					M1_state <= nextstate;
+				end
+				
+			end
+			S_M1_CALC_V_PRIME:begin
+				M1_state <= S_M1_CALC_U_PRIME;
+			end
+			S_M1_CALC_U_PRIME:begin
+				M1_state <= S_M1_CALC_FIRST_RB;
+			end
+			S_M1_CALC_FIRST_RB:begin
+				SRAM_we_n <= 0;
+				M1_state <= S_M1_CALC_FIRST_G;
+			end
+			S_M1_CALC_FIRST_G:begin
+				M1_state <= S_M1_CALC_SECOND_RB;
+			end
+			S_M1_CALC_SECOND_RB:begin
+				M1_state <= S_M1_CALC_SECOND_G;
+			end
+			S_M1_CALC_SECOND_G:begin
+				M1_state <= ;
+			end
+			default: M1_state <= S_M1_IDLE;
+		endcase
 	end
 end
 multiplier multiplier_unit(
