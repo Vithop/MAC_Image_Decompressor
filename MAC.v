@@ -4,8 +4,11 @@
 `ifndef DISABLE_DEFAULT_NET
 `default_nettype none
 `endif
-//Multiplier and 
+//Multiplier and Accumulate
 module MAC (	
+	//When select is 0 U' is put into output a
+	//When select is 1 Red is placed in a and Blue in g
+	//When select is 2 Green is placed in d
 	input logic [1:0]select,
 
 	output logic [31:0] a
@@ -20,7 +23,6 @@ module MAC (
 	input logic [31:0] h,
 	input logic [31:0] i,
 
-	output logic [31:0] prime
 );
 logic [31:0] aOp1;
 logic [31:0] aOp2;
@@ -33,12 +35,6 @@ logic [63:0] dTemp;
 logic [31:0] gOp1;
 logic [31:0] gOp2;
 logic [63:0] gTemp;
-
-assign a = [31:0]aTemp;
-assign 
-assign d = [31:0]dTemp;
-assign 
-assign g = [31:0]gTemp;
 
 always_comb begin
 	if (select == 2'd0) begin
