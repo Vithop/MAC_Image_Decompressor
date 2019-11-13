@@ -21,6 +21,7 @@ module Milestone1 (
 
 Milestone1_state_type M1_state;
 // For Multiplier
+logic [1:0]	 MAC_selctor;
 logic [31:0] result_a;
 logic [31:0] in_b;	
 logic [31:0] in_c;
@@ -87,7 +88,7 @@ always @(posedge Clock or negedge Resetn) begin
 		endcase
 	end
 end
-multiplier multiplier_unit(
+MAC MAC_unit(
 	.a(result_a),
 	.b(in_b;),
 	.c(in_c),
