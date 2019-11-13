@@ -37,5 +37,43 @@ typedef enum logic [3:0] {
 	S_VS_FETCH_PIXEL_DATA_3
 } VGA_SRAM_state_type;
 
+typedef enum logic [3:0]{
+	S_M1_IDLE,
+	S_M1_CALC_V_PRIME,
+	S_M1_CALC_U_PRIME,
+	S_M1_CALC_FIRST_RB,
+	S_M1_CALC_FIRST_G,
+	S_M1_CALC_SECOND_RB,
+	S_M1_CALC_SECOND_G
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+	// S_M1_
+} Milestone1_state_type;
+/*
+typedef enum logic [3:0]{
+	S_M2_IDLE,
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+	S_M2_
+} Milestone2_state_type;
+*/
 `define DEFINE_STATE 1
 `endif

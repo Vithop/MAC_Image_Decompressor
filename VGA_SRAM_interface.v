@@ -40,17 +40,11 @@ parameter
    VIEW_AREA_BOTTOM = 360;
 		
 VGA_SRAM_state_type VGA_SRAM_state;
-// For Multiplier
-logic [31:0] result_a;
-logic [31:0] in_b;	
-logic [31:0] in_c;
-logic [31:0] result_d;
-logic [31:0] in_e;
-logic [31:0] in_f;
-logic [31:0] result_g;
-logic [31:0] in_h;
-logic [31:0] in_i;
 
+
+
+logic [17:0] SRAM_address;
+logic [15:0] SRAM_read_data;
 
 
 // For VGA
@@ -214,15 +208,4 @@ always_ff @ (posedge Clock or negedge Resetn) begin
 	end
 end
 
-multiplier multiplier_unit(
-	.a(result_a),
-	.b(in_b;),
-	.c(in_c),
-	.d(result_d),
-	.e(in_e),
-	.f(in_f),
-	.g(result_g),
-	.h(in_h),
-	.i(in_i)
-);
 endmodule

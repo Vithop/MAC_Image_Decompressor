@@ -22,7 +22,7 @@ module MAC_Image_Decompressor (
 		input logic CLOCK_50_I,                   // 50 MHz clock
 
 		/////// pushbuttons/switches              ////////////
-		input logic[3:0] PUSH_BUTTON_I,           // pushbuttons
+   		input logic[3:0] PUSH_BUTTON_I,           // pushbuttons
 		input logic[17:0] SWITCH_I,               // toggle switches
 
 		/////// 7 segment displays/LEDs           ////////////
@@ -107,7 +107,7 @@ VGA_SRAM_interface VGA_unit (
 	.VGA_enable(VGA_enable),
    
 	// For accessing SRAM
-	.SRAM_base_address(VGA_base_address),
+	.SRAM_base_address(     ),
 	.SRAM_address(VGA_SRAM_address),
 	.SRAM_read_data(SRAM_read_data),
    

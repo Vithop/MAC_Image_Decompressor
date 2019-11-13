@@ -18,6 +18,15 @@ module multiplier (
 	input logic [31:0] h,
 	input logic [31:0] i,
 );
+logic [63:0] aTemp;
+logic [63:0] dTemp;
+logic [63:0] gTemp;
+assign aTemp = b * c;
+assign a = [31:0]aTemp;
+assign dTemp = e * f;
+assign d = [31:0]dTemp;
+assign gTemp = h * i;
+assign g = [31:0]gTemp;
 
 	
 endmodule
