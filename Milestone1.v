@@ -41,26 +41,28 @@ logic [31:0] Op4;
 logic [31:0] Op5;
 logic [31:0] Op6;
 
-//For Calculating YUV values
-logic [16:0] J; // Pixel Position
-logic [15:0] Y;
-logic [15:0] U;
-logic [15:0] V;
+//For Calculating YUUV_countvalues
+logic [16:0] RGB_count; // Pixel Position
+logic [15:0] Y_count;
+logic [15:0] UV_count;
 
 logic [15:0] U_prime_even;
-logic [15:0] U_prime_odd;
-// U/V_buffer[5] is (j+5)/2
-logic [15:0] U_buffer [5:0]
-logic [15:0] V_prime_even;
-logic [15:0] V_prime_odd;
-logic [15:0] V_buffer [5:0]
+logic [31:0] U_prime_odd;
+// U/V_buffer[5] is (RGB_count+5)/2
+logic [7:0] U_buffer [5:0]
+logic [7:0] V_prime_even;
+logic [31:0] V_prime_odd;
+logic [7:0] V_buffer [5:0]
 logic read_UV_flag;
-logic [15:0] Y_prime [1:0]
+logic [7:0] Y [1:0]
 
 //RGB Values
-logic [7:0] R;
-logic [7:0] G;
-logic [7:0] B;
+logic [7:0] R_even;
+logic [7:0] R_odd;
+logic [7:0] G_even;
+logic [7:0] G_odd;
+logic [7:0] B_even;
+logic [7:0] B_odd;
 logic [7:0] B_buffer;
 
 assign result_a = [31:0](Op1 * Op2) ;
@@ -74,8 +76,8 @@ always @(posedge Clock or negedge Resetn) begin
 		SRAM_we_n <= 1'b0;
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 16'd0;
-		read_UV_flag = 1'b0;
-		J <= 16'd0;
+		read_UV_flag = 1'b1;
+		RGB_count <= 16'd0;
 		M1_state <= S_M1_IDLE;
 	end	else begin
 		case(M1_state)
@@ -86,28 +88,25 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 				
 			end
+			//****START OF LEAD IN CYCLES
 			S_M1_LI_FIRST_READ_V:begin
 				SRAM_address = intit_U_address;
 				SRAM_we_n <= 1'b0;
-				J <= 16'd0;
 				M1_state <= S_M1_LI_FIRST_READ_U;
 
 			end
 			S_M1_LI_FIRST_READ_U:begin
 				SRAM_address = intit_Y_address;
-				J <= 16'd0;
 				M1_state <= S_M1_LI_FIRST_READ_Y;
 			end
 			S_M1_LI_FIRST_READ_Y:begin
-				V <= V + 1'd1;
+				UV_count <= UV_count + 1'd1;
 				SRAM_address = intit_V_address + V;
 
-				J <= 16'd0;
 				M1_state <= S_M1_LI_V1;
 			end
 			S_M1_LI_V1:begin
-				U <= U + 1'd1;
-				SRAM_address = intit_U_address + U;
+				SRAM_address = intit_U_address + UV_count;
 
 				V_prime_even <= [15:8]SRAM_read_data;
 				V_buffer[5] <= [7:0]SRAM_read_data;
@@ -128,7 +127,7 @@ always @(posedge Clock or negedge Resetn) begin
 				U_buffer[0] <= U_prime_even;
 				M1_state <= S_M1_LI_Y1;
 			end
-			S_M1_LI_Y1	:begin
+			S_M1_LI_Y1:begin
 				Y_prime <= SRAM_read_data;
 				M1_state <= S_M1_LI_CALC_V;
 			end
@@ -154,24 +153,97 @@ always @(posedge Clock or negedge Resetn) begin
 				//is a placehorder for a calculation
 				M1_state <= S_M1_CALC_FIRST_RB;
 			end
-			S_M1_CALC_V_PRIME:begin
-				M1_state <= S_M1_CALC_U_PRIME;
-			end
-			S_M1_CALC_U_PRIME:begin
-				M1_state <= S_M1_CALC_FIRST_RB;
-			end
+			//****START OF REPEATING CYCLES
 			S_M1_CALC_FIRST_RB:begin
-				SRAM_we_n <= 0;
-				M1_state <= S_M1_CALC_FIRST_G;
+				if(read_UV_flag == 1'b0) begin
+					SRAM_we_n <= 1'b0;
+					UV_count <= UV_count + 1'd1;
+					SRAM_address = intit_V_address + V;
+					M1_state <= S_M1_CALC_FIRST_G;
+				end else begin
+
+				end
+
 			end
 			S_M1_CALC_FIRST_G:begin
+				if(read_UV_flag == 1'b0) begin
+					SRAM_address = intit_V_address + UV_count;
+					M1_state <= S_M1_CALC_SECOND_RB;
+				end else begin
+
+				end
+
 				M1_state <= S_M1_CALC_SECOND_RB;
 			end
 			S_M1_CALC_SECOND_RB:begin
+				if(read_UV_flag == 1'b0) begin
+					Y_count <= Y_count + 1'd1;
+					SRAM_address = intit_Y_address + Y_count;
+					M1_state <= S_M1_CALC_SECOND_G;
+				end else begin
+
+				end
+
 				M1_state <= S_M1_CALC_SECOND_G;
 			end
 			S_M1_CALC_SECOND_G:begin
+				if(read_UV_flag == 1'b0) begin
+					SRAM_write_data <= {R_even, G_even};
+					SRAM_we_n <= 1'b1;
+					SRAM_address <= init_RGB_address + RGB_count
+					RGB_count <= RGB_count + 1'd1;
+					M1_state <= S_M1_CALC_V_PRIME;
+				end else begin
+
+				end
+
 				M1_state <= ;
+			end
+			S_M1_CALC_V_PRIME:begin
+				if(read_UV_flag == 1'b0) begin
+
+					V_buffer[5] <= [15:8]SRAM_read_data;
+					V_buffer[4] <= V_buffer[5]
+					V_buffer[3] <= V_buffer[4];
+					V_buffer[2] <= V_buffer[3];
+					V_buffer[1] <= V_buffer[2];
+					V_buffer[0] <= V_buffer[1];
+					
+					V_prime_even <= V_buffer[3];
+
+					SRAM_write_data <= {B_even, R_odd};
+					SRAM_we_n <= 1'b1;
+					SRAM_address <= init_RGB_address + RGB_count
+					RGB_count <= RGB_count + 1'd1;
+					M1_state <= S_M1_CALC_V_PRIME;
+				end else begin
+
+				end
+
+				M1_state <= S_M1_CALC_U_PRIME;
+			end
+			S_M1_CALC_U_PRIME:begin
+				if(read_UV_flag == 1'b0) begin
+
+					U_buffer[5] <= [15:8]SRAM_read_data;
+					U_buffer[4] <= U_buffer[5];
+					U_buffer[3] <= U_buffer[4]
+					U_buffer[2] <= U_buffer[3];
+					U_buffer[1] <= U_buffer[2];
+					U_buffer[0] <= U_buffer[1];
+
+					U_prime_even <= U_buffer[3]
+					SRAM_write_data <= {G_odd, B_odd}
+					SRAM_we_n <= 1'b1;
+					SRAM_address <= init_RGB_address + RGB_count
+					RGB_count <= RGB_count + 1'd1;
+					read_UV_flag <= ~read_UV_flag;
+					M1_state <= S_M1_CALC_FIRST_RB;
+				end else begin
+
+				end
+
+				M1_state <= S_M1_CALC_FIRST_RB;
 			end
 			default: M1_state <= S_M1_IDLE;
 		endcase
