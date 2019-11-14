@@ -75,6 +75,8 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = V_buffer[5] + V_buffer[5];
 		Op6 = 31'd159;
+		V_prime_odd = $signed(result_a - result_b + result_c + 31'd128)>>>8;
+		U_prime_odd = 0;
 	end else if (M1_state == S_M1_LI_CALC_U || M1_state == S_M1_CALC_U_PRIME) begin
 		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
@@ -82,6 +84,8 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = U_buffer[5] + U_buffer[5];
 		Op6 = 31'd159;
+		U_prime_odd = $signed(result_a - result_b + result_c + 31'd128)>>>8;
+		V_prime_odd = 0
 	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_CALC_SECOND_RB) begin
 		Op1 = Y - 31'd16;
 		Op2 = 31'd76284;
