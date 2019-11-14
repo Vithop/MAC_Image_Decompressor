@@ -32,14 +32,14 @@ logic [31:0] result_a;
 logic [31:0] result_b;
 logic [31:0] result_c;
 
-logic [31:0] Op1;
-logic [31:0] Op2;
+longint Op1;
+longint Op2;
 
-logic [31:0] Op3;
-logic [31:0] Op4;
+longint Op3;
+longint Op4;
 
-logic [31:0] Op5;
-logic [31:0] Op6;
+longint Op5;
+longint Op6;
 
 //For Calculating YUV values
 logic [16:0] J; // Pixel Position
@@ -67,6 +67,44 @@ assign result_a = [31:0](Op1 * Op2) ;
 assign result_b = [31:0](Op3 * Op4) ;
 assign result_c = [31:0](Op5 * Op6) ;
 
+always_comb begin
+	if(M1_state == S_M1_LI_CALC_V || M1_state == S_M1_CALC_V_PRIME)begin
+		Op1 = V_buffer[5] + V_buffer[0];
+		Op2 = 31'd21;
+		Op3 = V_buffer[4] + V_buffer[1];
+		Op4 = 31'd52;
+		Op5 = V_buffer[5] + V_buffer[5];
+		Op6 = 31'd159;
+	end else if (M1_state == S_M1_LI_CALC_U || M1_state == S_M1_CALC_U_PRIME) begin
+		Op1 = U_buffer[5] + U_buffer[0];
+		Op2 = 31'd21;
+		Op3 = U_buffer[4] + U_buffer[1];
+		Op4 = 31'd52;
+		Op5 = U_buffer[5] + U_buffer[5];
+		Op6 = 31'd159;
+	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_CALC_SECOND_RB) begin
+		Op1 = Y - 31'd16;
+		Op2 = 31'd76284;
+		Op3 = U - 31'd128
+		Op4 = 31'd132251;
+		Op5 = V - 31'd128;
+		Op6 = 31'd104595;
+	end else if (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_CALC_SECOND_G) begin
+		Op1 = Y - 31'd16;
+		Op2 = 31'd76284;
+		Op3 = U - 31'd128
+		Op4 = 31'd25624;
+		Op5 = V - 31'd128;
+		Op6 = 31'd53281;
+	end else begin
+		Op1 = 0;
+		Op2 = 0;
+		Op3 = 0;
+		Op4 = 0;
+		Op5 = 0;
+		Op6 = 0;
+	end
+end
 
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
@@ -141,6 +179,7 @@ always @(posedge Clock or negedge Resetn) begin
 				V_buffer[0] <= V_buffer[2];
 				// vithuran is a slow poke and so this
 				//is a placehorder for a calculation
+
 				M1_state <= S_M1_LI_CALC_U;
 			end
 			S_M1_LI_CALC_U:begin
