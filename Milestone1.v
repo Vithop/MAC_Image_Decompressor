@@ -178,7 +178,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LI_Y1;
 			end
 			S_M1_LI_Y1:begin
-				Y_prime <= SRAM_read_data;
+				Y <= SRAM_read_data;
 				M1_state <= S_M1_LI_CALC_V;
 			end
 			S_M1_LI_CALC_V:begin
@@ -188,9 +188,6 @@ always @(posedge Clock or negedge Resetn) begin
 				V_buffer[2] <= V_buffer[4];
 				V_buffer[1] <= V_buffer[3];
 				V_buffer[0] <= V_buffer[2];
-				// vithuran is a slow poke and so this
-				//is a placehorder for a calculation
-
 				M1_state <= S_M1_LI_CALC_U;
 			end
 			S_M1_LI_CALC_U:begin
@@ -200,24 +197,23 @@ always @(posedge Clock or negedge Resetn) begin
 				U_buffer[2] <= U_buffer[4];
 				U_buffer[1] <= U_buffer[3];
 				U_buffer[0] <= U_buffer[2];
-				// vithuran is a slow poke and so this
-				//is a placehorder for a calculation
 				M1_state <= S_M1_CALC_FIRST_RB;
 			end
 			//****START OF REPEATING CYCLES
 			S_M1_CALC_FIRST_RB:begin
-				if(read_UV_flag == 1'b0) begin
-					SRAM_we_n <= 1'b0;
+				if(read_UV_flag == 1'b1) begin
 					UV_count <= UV_count + 1'd1;
 					SRAM_address = intit_V_address + V;
-					M1_state <= S_M1_CALC_FIRST_G;
 				end else begin
-
+					Y <= SRAM_read_data
 				end
+				U_prime_odd <= (result_a + result_b + result_c) >>> 8;
+				SRAM_we_n <= 1'b0;
+				M1_state <= S_M1_CALC_FIRST_G;
 
 			end
 			S_M1_CALC_FIRST_G:begin
-				if(read_UV_flag == 1'b0) begin
+				if(read_UV_flag == 1'b1) begin
 					SRAM_address = intit_V_address + UV_count;
 					M1_state <= S_M1_CALC_SECOND_RB;
 				end else begin
@@ -227,7 +223,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_CALC_SECOND_RB;
 			end
 			S_M1_CALC_SECOND_RB:begin
-				if(read_UV_flag == 1'b0) begin
+				if(read_UV_flag == 1'b1) begin
 					Y_count <= Y_count + 1'd1;
 					SRAM_address = intit_Y_address + Y_count;
 					M1_state <= S_M1_CALC_SECOND_G;
@@ -238,7 +234,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_CALC_SECOND_G;
 			end
 			S_M1_CALC_SECOND_G:begin
-				if(read_UV_flag == 1'b0) begin
+				if(read_UV_flag == 1'b1) begin
 					SRAM_write_data <= {R_even, G_even};
 					SRAM_we_n <= 1'b1;
 					SRAM_address <= init_RGB_address + RGB_count
@@ -251,7 +247,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= ;
 			end
 			S_M1_CALC_V_PRIME:begin
-				if(read_UV_flag == 1'b0) begin
+				if(read_UV_flag == 1'b1) begin
 
 					V_buffer[5] <= [15:8]SRAM_read_data;
 					V_buffer[4] <= V_buffer[5]
@@ -274,7 +270,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_CALC_U_PRIME;
 			end
 			S_M1_CALC_U_PRIME:begin
-				if(read_UV_flag == 1'b0) begin
+				if(read_UV_flag == 1'b1) begin
 
 					U_buffer[5] <= [15:8]SRAM_read_data;
 					U_buffer[4] <= U_buffer[5];
