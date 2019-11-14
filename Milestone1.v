@@ -233,7 +233,7 @@ always @(posedge Clock or negedge Resetn) begin
 					RGB_count <= RGB_count + 1'd1;
 					M1_state <= S_M1_CALC_V_PRIME;
 				end else begin
-
+					
 				end
 
 				M1_state <= ;
