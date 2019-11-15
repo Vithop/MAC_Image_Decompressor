@@ -18,18 +18,19 @@ vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET convert_hex_to_seven_segment
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET VGA_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET PB_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION SRAM_Controller.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION Milestone1.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_SRAM_Emulator.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION UART_Receive_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET VGA_SRAM_interface.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET UART_SRAM_interface.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET Clock_100_PLL.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET MAC_Image_Decompressor.v
-# vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor.v
-vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor_v2.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor.v
+# vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor_v2.v
 
 # specify library for simulation
-#vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor
-vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor_v2
+vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor
+# vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor_v2
 
 # Clear previous simulation
 restart -f

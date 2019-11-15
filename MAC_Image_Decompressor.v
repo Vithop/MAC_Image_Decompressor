@@ -171,7 +171,7 @@ SRAM_Controller SRAM_unit (
 
 assign SRAM_ADDRESS_O[19:18] = 2'b00;
 
-Milestone1 M1_unit (
+Milestone1 M1_unit(
 	.Clock(CLOCK_50_I),
 	.Resetn(~SWITCH_I[17]),
 	.Enable(M1_enable),
