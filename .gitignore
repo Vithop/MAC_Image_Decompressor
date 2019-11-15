@@ -69,3 +69,14 @@ db/
 _output_files/
 PLLJ_PLLSPE_INFO.txt
 wlft5cwwt9
+*.dat
+*.dbs
+*.prw
+*.vhd
+*.psm
+rtl_work/_info
+rtl_work/_vmake
+wlft7z7mm5
+wlftbj9v0g
+wlftbj9v0g
+wlftbj9v0g
