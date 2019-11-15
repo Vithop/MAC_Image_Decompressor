@@ -62,6 +62,7 @@
 */simulation/
 */timing/
 */testbench/
+*/rtl_work/
 */*_sim/
 incremental_db/
 db/
