@@ -80,6 +80,13 @@ logic [15:0] UART_SRAM_write_data;
 logic UART_SRAM_we_n;
 logic [25:0] UART_timer;
 
+//For Milestone1 SRAM interface
+logic M1_enable;
+logic [17:0] M1_SRAM_address;
+logic [15:0] M1_SRAM_read_data;
+logic [15:0] M1_SRAM_write_data;
+logic M1_SRAM_we_n;
+
 logic [6:0] value_7_segment [7:0];
 
 // For error detection in UART
@@ -164,6 +171,16 @@ SRAM_Controller SRAM_unit (
 
 assign SRAM_ADDRESS_O[19:18] = 2'b00;
 
+Milestone1 M1_unit (
+	.Clock(CLOCK_50_I),
+	.Resetn(~SWITCH_I[17]),
+	.Enable(M1_enable),
+	.SRAM_address(M1_SRAM_address),
+	.SRAM_read_data(M1_SRAM_read_data),
+	.SRAM_write_data(M1_SRAM_write_data),
+	.SRAM_we_n(M1_SRAM_we_n)
+);
+
 always @(posedge CLOCK_50_I or negedge resetn) begin
 	if (~resetn) begin
 		top_state <= S_IDLE;
@@ -205,7 +222,17 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 				UART_rx_initialize <= 1'b1;
 				 				
 				VGA_enable <= 1'b1;
-				top_state <= S_IDLE;
+				top_state <= S_ENABLE_M1;
+			end
+		end
+		S_ENABLE_M1: begin
+			M1_enable <= 1'b1;
+			top_state <= S_WAIT_M1;
+		end
+		S_WAIT_M1: begin
+			if (SRAM_address == 17'd262143) begin
+				M1_enable <= 1'b00;
+				top_state <= S_WAIT_M2;
 			end
 		end
 		default: top_state <= S_IDLE;
