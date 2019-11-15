@@ -67,9 +67,9 @@ logic [7:0] B_even;
 logic [7:0] B_odd;
 logic [7:0] B_buffer;
 
-assign result_a = [31:0](Op1 * Op2) ;
-assign result_b = [31:0](Op3 * Op4) ;
-assign result_c = [31:0](Op5 * Op6) ;
+assign result_a = [31:0](Op1 * Op2);
+assign result_b = [31:0](Op3 * Op4);
+assign result_c = [31:0](Op5 * Op6);
 
 always_comb begin
 	if(M1_state == S_M1_LI_CALC_V || M1_state == S_M1_CALC_V_PRIME)begin
@@ -174,21 +174,21 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_LI_V1:begin
 				SRAM_address = intit_U_address + UV_count;
 
-				V_buffer[5] <= [7:0]SRAM_read_data;
-				V_buffer[4] <= [15:8]SRAM_read_data;
-				V_buffer[3] <= V_buffer[4];
-				V_buffer[2] <= V_buffer[4];
-				V_buffer[1] <= V_buffer[4];
 				V_buffer[0] <= V_buffer[4];
+				V_buffer[1] <= V_buffer[4];
+				V_buffer[2] <= V_buffer[4];
+				V_buffer[3] <= V_buffer[4];
+				V_buffer[4] <= [15:8]SRAM_read_data;
+				V_buffer[5] <= [7:0]SRAM_read_data;
 				M1_state <= S_M1_LI_U1;
 			end
 			S_M1_LI_U1:begin
-				U_buffer[5] <= [7:0]SRAM_read_data;
-				U_buffer[4] <= [15:8]SRAM_read_data;
-				U_buffer[3] <= U_buffer[4];
-				U_buffer[2] <= U_buffer[4];
-				U_buffer[1] <= U_buffer[4];
 				U_buffer[0] <= U_buffer[4];
+				U_buffer[1] <= U_buffer[4];
+				U_buffer[2] <= U_buffer[4];
+				U_buffer[3] <= U_buffer[4];
+				U_buffer[4] <= [15:8]SRAM_read_data;
+				U_buffer[5] <= [7:0]SRAM_read_data;
 				M1_state <= S_M1_LI_Y1;
 			end
 			S_M1_LI_Y1:begin
