@@ -256,7 +256,7 @@ assign SRAM_write_data = UART_SRAM_write_data;
 
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 
-						: 1'b1;
+						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n : 1'b1;
 
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (

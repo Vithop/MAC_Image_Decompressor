@@ -368,7 +368,8 @@ always @(posedge Clock or negedge Resetn) begin
 					V_buffer[3] <= V_buffer[4];
 					V_buffer[4] <= V_buffer[5];
 					V_buffer[5] <= V_odd;	
-					Y <= SRAM_read_data;
+					Y[0] <= {SRAM_read_data[7:0]};
+					Y[1] <= {SRAM_read_data[15:8]};
 				end
 
 				SRAM_write_data <= {G_odd, B_odd};
