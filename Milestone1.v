@@ -329,12 +329,12 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_FIRST_G;
 			end
 			S_M1_LO_CALC_FIRST_G:begin
-				if (Y_count ~= 16'd38399) begin
+				if (Y_count != 16'd38399) begin
 					SRAM_address = intit_Y_address + Y_count;
 				end
 
-				R_even = (result_a + result_b) >>> 16;
-				B_even = (result_a + result_c) >>> 16;
+				R_even <= (result_a + result_b) >>> 16;
+				B_even <= (result_a + result_c) >>> 16;
 
 				M1_state <= S_M1_LO_CALC_SECOND_RB;
 			end
@@ -349,7 +349,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_LO_CALC_SECOND_G:begin
 				R_odd = result_a + result_b;
 				B_odd = result_a + result_c;
-				SRAM_address <= init_RGB_address + RGB_count
+				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 
 				SRAM_write_data <= {B_even, R_odd};
@@ -357,15 +357,15 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_WRITE_BR;
 			end
 			S_M1_LO_WRITE_BR:begin
-				SRAM_address <= init_RGB_address + RGB_count
+				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 
-				if (Y_count ~= 16'd38399) begin
+				if (Y_count != 16'd38399) begin
 					V_buffer[0] <= V_buffer[1];
 					V_buffer[1] <= V_buffer[2];
 					V_buffer[2] <= V_buffer[3];
 					V_buffer[3] <= V_buffer[4];
-					V_buffer[4] <= V_buffer[5]
+					V_buffer[4] <= V_buffer[5];
 					V_buffer[5] <= V_odd;	
 					Y <= SRAM_read_data;
 				end
@@ -375,11 +375,11 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_WRITE_GB;
 			end
 			S_M1_LO_WRITE_GB:begin
-				if (Y_count ~= 16'd38399) begin
+				if (Y_count != 16'd38399) begin
 					U_buffer[0] <= U_buffer[1];
 					U_buffer[1] <= U_buffer[2];
 					U_buffer[2] <= U_buffer[3];
-					U_buffer[3] <= U_buffer[4]
+					U_buffer[3] <= U_buffer[4];
 					U_buffer[4] <= U_buffer[5];
 					U_buffer[5] <= U_odd;
 				end
