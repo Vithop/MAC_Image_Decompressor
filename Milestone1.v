@@ -35,6 +35,13 @@ logic [63:0] temp_a;
 logic [63:0] temp_b;
 logic [63:0] temp_c;
 
+// logic result_a <= 32'd0;
+// logic result_b <= 32'd0;
+// logic result_c <= 32'd0;
+// logic temp_a <= 63'd0;
+// logic temp_b <= 63'd0;
+// logic temp_c <= 63'd0;
+
 longint Op1;
 longint Op2;
 
@@ -123,23 +130,14 @@ always_comb begin
 		Op5 = V_prime - 31'd128;
 		Op6 = 31'd53281;
 	end else begin
-		Op1 = 0;
-		Op2 = 0;
-		Op3 = 0;
-		Op4 = 0;
-		Op5 = 0;
-		Op6 = 0;
+		Op1 = 31'd0;
+		Op2 = 31'd0;
+		Op3 = 31'd0;
+		Op4 = 31'd0;
+		Op5 = 31'd0;
+		Op6 = 31'd0;
 	end
-	// if (M1_state == S_M1_CALC_FIRST_RB) begin
-	// 	R_even = result_a + result_b;
-	// 	B_even = result_a + result_c;
-	// end else if (M1_state == S_M1_CALC_SECOND_RB) 
-	// 	R_odd = result_a + result_b;
-	// 	B_odd = result_a + result_c;
-	// end else if (M1_state == S_M1_CALC_FIRST_G) begin
-	// 	G_odd  = result_a - result_b - result_c;
-		
-	// end
+
 end
 
 always @(posedge Clock or negedge Resetn) begin
@@ -149,7 +147,11 @@ always @(posedge Clock or negedge Resetn) begin
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 16'd0;
 		read_UV_flag = 1'b1;
+
 		RGB_count <= 16'd0;
+		Y_count <= 16'd0;
+		UV_count <= 16'd0;
+		
 		M1_state <= S_M1_IDLE;
 	end	else begin
 		case(M1_state)
