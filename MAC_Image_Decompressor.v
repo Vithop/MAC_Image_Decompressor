@@ -210,6 +210,11 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 								
 				top_state <= S_ENABLE_UART_RX;
 			end
+			`ifdef SIMULATION
+				if(UART_timer ==26'd15) begin
+					top_state <= S_ENABLE_M1;
+				end
+			`endif
 		end
 		S_ENABLE_UART_RX: begin
 			// Enable the UART receiver
@@ -245,7 +250,7 @@ assign VGA_base_address = 18'd0;
 // Give access to SRAM for UART and VGA at appropriate time
 assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_address 
-						: VGA_SRAM_address;
+						: (top_state == S_WAIT_M1) ? M1_SRAM_address : VGA_SRAM_address;
 
 assign SRAM_write_data = UART_SRAM_write_data;
 

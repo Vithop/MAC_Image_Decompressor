@@ -292,7 +292,8 @@ always @(posedge Clock or negedge Resetn) begin
 					V_odd <= {SRAM_read_data[7:0]};
 					V_buffer[5] <= {SRAM_read_data[15:8]};
 				end else begin
-					Y <= SRAM_read_data;
+					Y[0] <= {SRAM_read_data[7:0]};
+					Y[1] <= {SRAM_read_data[15:8]};
 					SRAM_write_data <= {G_odd, B_odd};
 					V_buffer[5] <= V_odd;	
 				end
