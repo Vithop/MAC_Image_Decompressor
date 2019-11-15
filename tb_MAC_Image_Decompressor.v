@@ -88,7 +88,7 @@ logic UART_TX_O;
 logic VGA_display_enable;
 
 // Instantiate the unit under test
-project uut (
+MAC_Image_Decompressor uut(
 		.CLOCK_50_I(Clock_50),
 		.SWITCH_I(Switches),
 		.PUSH_BUTTON_I(Push_buttons),		

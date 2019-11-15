@@ -36,6 +36,7 @@ set_global_assignment -name VERILOG_FILE UART_SRAM_interface.v
 set_global_assignment -name VERILOG_FILE VGA_SRAM_interface.v
 set_global_assignment -name VERILOG_FILE Clock_100_PLL.v
 set_global_assignment -name VERILOG_FILE MAC_Image_Decompressor.v
+set_global_assignment -name VERILOG_FILE Milestone1.v
 set_global_assignment -name VERILOG_FILE SRAM_Controller.v
 set_global_assignment -name VERILOG_FILE VGA_Controller.v
 set_global_assignment -name VERILOG_FILE PB_Controller.v
