@@ -41,12 +41,6 @@ parameter
 		
 VGA_SRAM_state_type VGA_SRAM_state;
 
-
-
-logic [17:0] SRAM_address;
-logic [15:0] SRAM_read_data;
-
-
 // For VGA
 logic    [9:0]    VGA_red, VGA_green, VGA_blue;
 logic    [9:0]    pixel_X_pos;
