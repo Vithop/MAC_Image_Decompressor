@@ -37,7 +37,8 @@ typedef enum logic [3:0] {
 	S_VS_FETCH_PIXEL_DATA_3
 } VGA_SRAM_state_type;
 
-typedef enum logic [3:0]{
+typedef enum logic [4:0]{
+	S_M1_IDLE,
 	//lEAD IN STATES
 	S_M1_LI_FIRST_READ_V,
 	S_M1_LI_FIRST_READ_U,
@@ -48,7 +49,6 @@ typedef enum logic [3:0]{
 	S_M1_LI_CALC_V,
 	S_M1_LI_CALC_U,
 	//REPEATING STATES
-	S_M1_IDLE,
 	S_M1_CALC_FIRST_RB,
 	S_M1_CALC_FIRST_G,
 	S_M1_CALC_SECOND_RB,
@@ -56,10 +56,12 @@ typedef enum logic [3:0]{
 	S_M1_CALC_V_PRIME,
 	S_M1_CALC_U_PRIME,
 	//LEAD OUT STATES
-	S_M1_
-	S_M1_
-	S_M1_
-	S_M1_
+	S_M1_LO_CALC_FIRST_RB,
+	S_M1_LO_CALC_FIRST_G,
+	S_M1_LO_CALC_SECOND_RB,
+	S_M1_LO_CALC_SECOND_G,
+	S_M1_LO_WRITE_BR,
+	S_M1_LO_WRITE_GB
 } Milestone1_state_type;
 /*
 typedef enum logic [3:0]{
