@@ -51,13 +51,13 @@ logic [15:0] UV_count;
 
 logic [7:0] U_odd;
 logic [31:0] U_prime;
-logic [7:0] U_buffer [5:0]	// U/V_buffer[5] is (RGB_count+5)/2
+logic [7:0] U_buffer [5:0];	// U/V_buffer[5] is (RGB_count+5)/2
 
 logic [7:0] V_odd;
 logic [31:0] V_prime;
-logic [7:0] V_buffer [5:0]
+logic [7:0] V_buffer [5:0];
 
-logic [7:0] Y [1:0]
+logic [7:0] Y [1:0];
 
 logic read_UV_flag;
 
@@ -173,7 +173,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LI_FIRST_READ_Y:begin
 				UV_count <= UV_count + 1'd1;
-				SRAM_address = intit_V_address + V;
+				SRAM_address = intit_V_address + UV_count;
 				M1_state <= S_M1_LI_V1;
 			end
 			S_M1_LI_V1:begin
@@ -197,7 +197,8 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LI_Y1;
 			end
 			S_M1_LI_Y1:begin
-				Y <= SRAM_read_data;
+				Y[0] <= {SRAM_read_data[7:0]};
+				Y[1] <= {SRAM_read_data[15:8]};
 				M1_state <= S_M1_LI_CALC_V;
 			end
 			S_M1_LI_CALC_V:begin
@@ -224,7 +225,8 @@ always @(posedge Clock or negedge Resetn) begin
 					UV_count <= UV_count + 1'd1;
 					SRAM_address = intit_V_address + UV_count;
 				end else begin
-					Y <= SRAM_read_data;
+					Y[0] <= {SRAM_read_data[7:0]};
+					Y[1] <= {SRAM_read_data[15:8]};
 				end
 
 				U_prime <= (result_a + result_b + result_c) >>> 8;
@@ -279,13 +281,13 @@ always @(posedge Clock or negedge Resetn) begin
 				V_buffer[1] <= V_buffer[2];
 				V_buffer[2] <= V_buffer[3];
 				V_buffer[3] <= V_buffer[4];
-				V_buffer[4] <= V_buffer[5]
+				V_buffer[4] <= V_buffer[5];
 				
 				M1_state <= S_M1_CALC_U_PRIME;
 
 				if(read_UV_flag == 1'b1) begin
 					SRAM_write_data <= {B_even, R_odd};
-					V_odd <= [7:0]SRAM_read_data;
+					V_odd <= {SRAM_read_data[7:0]};
 					V_buffer[5] <= {SRAM_read_data[15:8]};
 				end else begin
 					SRAM_write_data <= {G_odd, B_odd};
@@ -296,7 +298,7 @@ always @(posedge Clock or negedge Resetn) begin
 				U_buffer[0] <= U_buffer[1];
 				U_buffer[1] <= U_buffer[2];
 				U_buffer[2] <= U_buffer[3];
-				U_buffer[3] <= U_buffer[4]
+				U_buffer[3] <= U_buffer[4];
 				U_buffer[4] <= U_buffer[5];
 
 				read_UV_flag <= ~read_UV_flag;
