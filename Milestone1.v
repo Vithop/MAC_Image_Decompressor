@@ -266,6 +266,7 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_we_n <= 1'b1;
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
+				M1_state <= S_M1_CALC_V_PRIME;
 
 				if(read_UV_flag == 1'b1) begin
 					SRAM_write_data <= {R_even, G_even};
