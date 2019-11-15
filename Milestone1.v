@@ -305,8 +305,11 @@ always @(posedge Clock or negedge Resetn) begin
 				U_buffer[4] <= U_buffer[5];
 
 				read_UV_flag <= ~read_UV_flag;
-
-				M1_state <= S_M1_CALC_FIRST_RB;
+				if (Y_count == 16'd38397) begin
+					M1_state <= S_M1_LO_CALC_FIRST_RB;
+				end else begin
+					M1_state <= S_M1_CALC_FIRST_RB;
+				end
 
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address <= init_RGB_address + RGB_count;
@@ -326,7 +329,9 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_FIRST_G;
 			end
 			S_M1_LO_CALC_FIRST_G:begin
-				SRAM_address = intit_Y_address + Y_count;
+				if (Y_count ~= 16'd38399) begin
+					SRAM_address = intit_Y_address + Y_count;
+				end
 
 				R_even = (result_a + result_b) >>> 16;
 				B_even = (result_a + result_c) >>> 16;
@@ -355,27 +360,30 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= init_RGB_address + RGB_count
 				RGB_count <= RGB_count + 1'd1;
 
-				V_buffer[0] <= V_buffer[1];
-				V_buffer[1] <= V_buffer[2];
-				V_buffer[2] <= V_buffer[3];
-				V_buffer[3] <= V_buffer[4];
-				V_buffer[4] <= V_buffer[5]
-				
+				if (Y_count ~= 16'd38399) begin
+					V_buffer[0] <= V_buffer[1];
+					V_buffer[1] <= V_buffer[2];
+					V_buffer[2] <= V_buffer[3];
+					V_buffer[3] <= V_buffer[4];
+					V_buffer[4] <= V_buffer[5]
+					V_buffer[5] <= V_odd;	
+					Y <= SRAM_read_data;
+				end
 
-				Y <= SRAM_read_data;
 				SRAM_write_data <= {G_odd, B_odd};
-				V_buffer[5] <= V_odd;	
 			
 				M1_state <= S_M1_LO_WRITE_GB;
 			end
 			S_M1_LO_WRITE_GB:begin
-				U_buffer[0] <= U_buffer[1];
-				U_buffer[1] <= U_buffer[2];
-				U_buffer[2] <= U_buffer[3];
-				U_buffer[3] <= U_buffer[4]
-				U_buffer[4] <= U_buffer[5];
+				if (Y_count ~= 16'd38399) begin
+					U_buffer[0] <= U_buffer[1];
+					U_buffer[1] <= U_buffer[2];
+					U_buffer[2] <= U_buffer[3];
+					U_buffer[3] <= U_buffer[4]
+					U_buffer[4] <= U_buffer[5];
+					U_buffer[5] <= U_odd;
+				end
 				
-				U_buffer[5] <= U_odd;
 				SRAM_we_n <= 1'b0;
 				
 				if (SRAM_address == 17'd262143) begin
