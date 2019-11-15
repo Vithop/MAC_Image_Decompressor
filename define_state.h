@@ -55,11 +55,11 @@ typedef enum logic [3:0]{
 	S_M1_CALC_SECOND_G,
 	S_M1_CALC_V_PRIME,
 	S_M1_CALC_U_PRIME,
-	// S_M1_
-	// S_M1_
-	// S_M1_
-	// S_M1_
 	//LEAD OUT STATES
+	S_M1_
+	S_M1_
+	S_M1_
+	S_M1_
 } Milestone1_state_type;
 /*
 typedef enum logic [3:0]{
