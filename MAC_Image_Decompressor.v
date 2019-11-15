@@ -86,6 +86,7 @@ logic [17:0] M1_SRAM_address;
 logic [15:0] M1_SRAM_read_data;
 logic [15:0] M1_SRAM_write_data;
 logic M1_SRAM_we_n;
+logic [3:0] M1_SRAM_state;
 
 logic [6:0] value_7_segment [7:0];
 
