@@ -88,16 +88,29 @@ always_comb begin
 		Op5 = U_buffer[5] + U_buffer[5];
 		Op6 = 31'd159;
 		//U_prime = $signed(result_a - result_b + result_c + 31'd128)>>>8;
-	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_CALC_SECOND_RB) begin
-		
-		Op1 = (M1_state == S_M1_CALC_FIRST_RB) ? Y[1] - 31'd16 : Y[0] - 31'd16;
+	end else if (M1_state == S_M1_CALC_FIRST_RB) begin
+		Op1 = Y[1] - 31'd1;
 		Op2 = 31'd76284;
 		Op3 = U_buffer[2] - 31'd128
 		Op4 = 31'd132251;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd104595;
-	end else if (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_CALC_SECOND_G) begin
-		Op1 = (M1_state == S_M1_CALC_FIRST_RB) ? Y[1] - 31'd16 : Y[0] - 31'd16;
+	end else if (M1_state == S_M1_CALC_SECOND_RB) begin
+		Op1 = Y[0] - 31'd16;
+		Op2 = 31'd76284;
+		Op3 = U_prime - 31'd128
+		Op4 = 31'd132251;
+		Op5 = V_prime - 31'd128;
+		Op6 = 31'd104595;
+	end else if (M1_state == S_M1_CALC_FIRST_G) begin
+		Op1 = Y[1] - 31'd1;
+		Op2 = 31'd76284;
+		Op3 = U_buffer[2] - 31'd128
+		Op4 = 31'd25624;
+		Op5 = V_buffer[2] - 31'd128;
+		Op6 = 31'd53281;
+	end else if (M1_state == S_M1_CALC_SECOND_G) begin
+		Op1 = Y[0] - 31'd16;
 		Op2 = 31'd76284;
 		Op3 = U_prime - 31'd128
 		Op4 = 31'd25624;
@@ -231,12 +244,12 @@ always @(posedge Clock or negedge Resetn) begin
 					SRAM_we_n <= 1'b0;
 					SRAM_address = intit_Y_address + Y_count;
 				end else begin
+					G_even  <= (result_a - result_b - result_c) >>> 16;
 					SRAM_write_data <= {R_even, G_even};
 					SRAM_we_n <= 1'b1;
 					SRAM_address <= init_RGB_address + RGB_count
 					RGB_count <= RGB_count + 1'd1;
 				end
-				G_odd  = (result_a - result_b - result_c >>> 16);
 				M1_state <= S_M1_CALC_SECOND_G;
 			end
 			S_M1_CALC_SECOND_G:begin
