@@ -25,7 +25,7 @@ Milestone1_state_type M1_state;
 parameter intit_Y_address = 18'd0,
 		intit_U_address = 18'd38400,
 		intit_V_address = 18'd57600,
-		init_RGB_address = 146944;
+		init_RGB_address = 18'd146944;
 
 // For Multiplier
 logic [31:0] result_a;
@@ -158,7 +158,6 @@ always @(posedge Clock or negedge Resetn) begin
 					M1_state <= S_M1_LI_FIRST_READ_V;
 					SRAM_address <= intit_V_address;
 				end
-				
 			end
 			//****START OF LEAD IN CYCLES
 			S_M1_LI_FIRST_READ_V:begin
@@ -172,7 +171,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LI_FIRST_READ_Y;
 			end
 			S_M1_LI_FIRST_READ_Y:begin
-				UV_count <= UV_count + 1'd1;
+				UV_count <= UV_count + 16'd1;
 				SRAM_address = intit_V_address + UV_count;
 				M1_state <= S_M1_LI_V1;
 			end
