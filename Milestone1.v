@@ -75,7 +75,6 @@ logic [7:0] G_even;
 logic [7:0] G_odd;
 logic [7:0] B_even;
 logic [7:0] B_odd;
-logic [7:0] B_buffer;
 
 assign temp_a = (Op1 * Op2);
 assign temp_b = (Op3 * Op4);
@@ -291,6 +290,7 @@ always @(posedge Clock or negedge Resetn) begin
 				V_buffer[3] <= V_buffer[4];
 				V_buffer[4] <= V_buffer[5];
 				
+				G_odd  <= (result_a - result_b - result_c) >>> 16;
 				M1_state <= S_M1_CALC_U_PRIME;
 
 				if(read_UV_flag == 1'b1) begin
@@ -321,7 +321,7 @@ always @(posedge Clock or negedge Resetn) begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address <= init_RGB_address + RGB_count;
 					RGB_count <= RGB_count + 1'd1;
-					SRAM_we_n <= 1'b0;
+					// SRAM_we_n <= 1'b0;
 					SRAM_write_data <= {G_odd, B_odd};
 					U_odd <= {SRAM_read_data[7:0]};
 					U_buffer[5] <= {SRAM_read_data[15:8]};
