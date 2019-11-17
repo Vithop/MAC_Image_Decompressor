@@ -4,6 +4,7 @@
 add wave uut/M1_unit/Enable
 add wave Clock_50
 add wave -divider {state of milestone 1}
+add wave uut/top_state
 add wave uut/M1_unit/M1_state
 add wave -unsigned uut/SRAM_address
 add wave -divider {counters for milestone 1}

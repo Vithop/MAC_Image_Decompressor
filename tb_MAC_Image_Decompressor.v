@@ -29,7 +29,7 @@ initial block starts on line 228)
 `define MAX_MISMATCHES 10
 
 // file for output
-`define OUTPUT_FILE_NAME "motorcycle_tb.ppm"
+`define OUTPUT_FILE_NAME "motorcycle_out.ppm"
 
 // file for comparison 
 `define COMPARE_FILE_NAME "motorcycle_decoded.ppm"

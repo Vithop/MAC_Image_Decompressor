@@ -238,9 +238,9 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 			top_state <= S_WAIT_M1;
 		end
 		S_WAIT_M1: begin
-			if (SRAM_address == 17'd262143) begin
+			if (SRAM_address == 18'd262143) begin
 				M1_enable <= 1'b00;
-				top_state <= S_WAIT_M2;
+				top_state <= S_IDLE;
 			end
 		end
 		S_WAIT_M2: begin
