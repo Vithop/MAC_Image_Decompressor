@@ -29,13 +29,13 @@ initial block starts on line 228)
 `define MAX_MISMATCHES 10
 
 // file for output
-`define OUTPUT_FILE_NAME "motorcycle_out.ppm"
+`define OUTPUT_FILE_NAME "cat_out.ppm"
 
 // file for comparison 
-`define COMPARE_FILE_NAME "motorcycle_decoded.ppm"
+`define COMPARE_FILE_NAME "cat_in.ppm"
 
 //// for milestone 1
-`define INPUT_FILE_NAME "motorcycle.sram_d1"
+`define INPUT_FILE_NAME "cat.sram_d0"
 
 //// for milestone 2
 //`define INPUT_FILE_NAME "motorcycle.sram_d2"

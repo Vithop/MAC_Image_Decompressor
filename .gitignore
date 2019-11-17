@@ -66,6 +66,7 @@
 */*_sim/
 incremental_db/
 db/
+simulation/modelsim
 _output_files/
 PLLJ_PLLSPE_INFO.txt
 wlft5cwwt9

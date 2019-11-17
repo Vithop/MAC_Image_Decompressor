@@ -250,7 +250,7 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 	end
 end
 
-assign VGA_base_address = 18'd0;
+assign VGA_base_address = 18'd146944;
 
 // Give access to SRAM for UART and VGA at appropriate time
 assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
