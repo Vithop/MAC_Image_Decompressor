@@ -333,7 +333,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_LO_CALC_FIRST_RB:begin
 				U_prime <= (result_a + result_b + result_c) >>> 8;
 				SRAM_we_n <= 1'b1;
-				if (Y_count != 16'd38399) begin
+				if (Y_count != 16'd38400) begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
 				end
@@ -367,7 +367,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LO_WRITE_BR:begin
 
-				if (Y_count != 16'd38399) begin
+				if (Y_count != 16'd38400) begin
 					V_buffer[0] <= V_buffer[1];
 					V_buffer[1] <= V_buffer[2];
 					V_buffer[2] <= V_buffer[3];
@@ -378,12 +378,13 @@ always @(posedge Clock or negedge Resetn) begin
 					Y[1] <= {SRAM_read_data[15:8]};
 				end
 				SRAM_address <= init_RGB_address + RGB_count;
+				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {G_odd, B_odd};
 			
 				M1_state <= S_M1_LO_WRITE_GB;
 			end
 			S_M1_LO_WRITE_GB:begin
-				if (Y_count != 16'd38399) begin
+				if (Y_count != 16'd38400) begin
 					U_buffer[0] <= U_buffer[1];
 					U_buffer[1] <= U_buffer[2];
 					U_buffer[2] <= U_buffer[3];
