@@ -243,6 +243,8 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 				top_state <= S_WAIT_M2;
 			end
 		end
+		S_WAIT_M2: begin
+		end
 		default: top_state <= S_IDLE;
 		endcase
 	end
