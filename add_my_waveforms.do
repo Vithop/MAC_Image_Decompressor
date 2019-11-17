@@ -16,7 +16,6 @@ add wave -divider {some label for my divider}
 add wave uut/SRAM_we_n
 add wave -decimal uut/SRAM_write_data
 add wave -decimal uut/SRAM_read_data
-add wave -decimal uut/M1_unit/SRAM_read_data
 add wave -divider {Calculated Values}
 add wave -decimal uut/M1_unit/U_buffer
 add wave -decimal uut/M1_unit/V_buffer
