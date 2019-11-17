@@ -255,7 +255,7 @@ assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UA
 						? UART_SRAM_address 
 						: (top_state == S_WAIT_M1) ? M1_SRAM_address : VGA_SRAM_address;
 
-assign SRAM_write_data = UART_SRAM_write_data;
+assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data : UART_SRAM_write_data;
 
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 

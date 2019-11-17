@@ -51,7 +51,7 @@ longint Op4;
 longint Op5;
 longint Op6;
 
-//For Calculating YUUV_countvalues
+//For Calculating YUV_countvalues
 logic [16:0] RGB_count; // Pixel Position
 logic [15:0] Y_count;
 logic [15:0] UV_count;
@@ -143,7 +143,7 @@ end
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		// reset
-		SRAM_we_n <= 1'b0;
+		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 16'd0;
 		read_UV_flag = 1'b1;
@@ -167,7 +167,7 @@ always @(posedge Clock or negedge Resetn) begin
 			//****START OF LEAD IN CYCLES
 			S_M1_LI_FIRST_READ_V:begin
 				SRAM_address = intit_U_address;
-				SRAM_we_n <= 1'b0;
+				SRAM_we_n <= 1'b1;
 				M1_state <= S_M1_LI_FIRST_READ_U;
 
 			end
@@ -233,7 +233,7 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 
 				U_prime <= (result_a + result_b + result_c) >>> 8;
-				SRAM_we_n <= 1'b0;
+				SRAM_we_n <= 1'b1;
 				M1_state <= S_M1_CALC_FIRST_G;
 
 			end
@@ -256,11 +256,11 @@ always @(posedge Clock or negedge Resetn) begin
 
 				if(read_UV_flag == 1'b1) begin
 					Y_count <= Y_count + 1'd1;
-					SRAM_we_n <= 1'b0;
+					SRAM_we_n <= 1'b1;
 					SRAM_address = intit_Y_address + Y_count;
 				end else begin
 					SRAM_write_data <= {R_even, G_even};
-					SRAM_we_n <= 1'b1;
+					SRAM_we_n <= 1'b0;
 					SRAM_address <= init_RGB_address + RGB_count;
 					RGB_count <= RGB_count + 1'd1;
 				end
@@ -268,7 +268,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_CALC_SECOND_G:begin
 				R_odd = result_a + result_b;
 				B_odd = result_a + result_c;
-				SRAM_we_n <= 1'b1;
+				SRAM_we_n <= 1'b0;
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				M1_state <= S_M1_CALC_V_PRIME;
@@ -281,7 +281,7 @@ always @(posedge Clock or negedge Resetn) begin
 
 			end
 			S_M1_CALC_V_PRIME:begin
-				SRAM_we_n <= 1'b1;
+				//SRAM_we_n <= 1'b1;
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 
@@ -321,18 +321,18 @@ always @(posedge Clock or negedge Resetn) begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address <= init_RGB_address + RGB_count;
 					RGB_count <= RGB_count + 1'd1;
-					SRAM_we_n <= 1'b1;
+					SRAM_we_n <= 1'b0;
 					SRAM_write_data <= {G_odd, B_odd};
 					U_odd <= {SRAM_read_data[7:0]};
 					U_buffer[5] <= {SRAM_read_data[15:8]};
 				end else begin
 					U_buffer[5] <= U_odd;
-					SRAM_we_n <= 1'b0;
+					SRAM_we_n <= 1'b1;
 				end
 			end
 			S_M1_LO_CALC_FIRST_RB:begin
 				U_prime <= (result_a + result_b + result_c) >>> 8;
-				SRAM_we_n <= 1'b0;
+				SRAM_we_n <= 1'b1;
 				if (Y_count != 16'd38399) begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
@@ -348,7 +348,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_LO_CALC_SECOND_RB:begin
 				G_even  <= (result_a - result_b - result_c) >>> 16;
 
-				SRAM_we_n <= 1'b1;
+				SRAM_we_n <= 1'b0;
 				SRAM_write_data <= {R_even, G_even};
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
@@ -394,7 +394,7 @@ always @(posedge Clock or negedge Resetn) begin
 				end else begin
 					M1_state <= S_M1_IDLE;
 				end	
-				SRAM_we_n <= 1'b0;
+				SRAM_we_n <= 1'b1;
 			end
 			default: M1_state <= S_M1_IDLE;
 		endcase
