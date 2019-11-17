@@ -262,7 +262,7 @@ assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data : UART_SR
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 
 						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n : 1'b1;
-
+assign M1_SRAM_read_data = SRAM_read_data;
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (
 	.hex_value(SRAM_read_data[15:12]), 
