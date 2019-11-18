@@ -25,12 +25,12 @@ vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET VGA_SRAM_interface.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET UART_SRAM_interface.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET Clock_100_PLL.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET  +define+SIMULATION MAC_Image_Decompressor.v
-vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor.v
-# vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor_v2.v
+# vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_MAC_Image_Decompressor_v2.v
 
 # specify library for simulation
-vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor
-# vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor_v2
+# vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor
+vsim -t 100ps -L altera_mf_ver -lib rtl_work tb_MAC_Image_Decompressor_v2
 
 # Clear previous simulation
 restart -f
