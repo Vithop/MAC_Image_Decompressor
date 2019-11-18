@@ -261,8 +261,6 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_CALC_FIRST_RB:begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address = intit_V_address + UV_count;
-				end else begin
-					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
 				SRAM_we_n <= 1'b1;
 				M1_state <= S_M1_CALC_FIRST_G;
@@ -297,8 +295,13 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_CALC_V_PRIME;
 
 				if(read_UV_flag == 1'b1) begin
+					V_odd <= {SRAM_read_data[7:0]};
+					V_buffer <= {SRAM_read_data[15:8], V_buffer[5:1]};
+
 					SRAM_write_data <= {R_even, G_even};
 				end else begin
+					Y_buffer[0] <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+					V_buffer <= {V_odd, V_buffer[5:1]};
 					SRAM_write_data <= {B_even, R_odd};
 				end
 
@@ -312,13 +315,10 @@ always @(posedge Clock or negedge Resetn) begin
 
 				if(read_UV_flag == 1'b1) begin
 					SRAM_write_data <= {B_even, R_odd};
-					V_odd <= {SRAM_read_data[7:0]};
-					V_buffer <= {SRAM_read_data[15:8], V_buffer[5:1]};
-					//V_buffer[5] <= {SRAM_read_data[15:8]};
+					U_odd <= {SRAM_read_data[7:0]};
+					U_buffer <= {SRAM_read_data[15:8], U_buffer[5:1]};					
 				end else begin
-					Y_buffer[0] <= {SRAM_read_data[7:0]};
-					Y_buffer[1] <= {SRAM_read_data[15:8]};
-					V_buffer <= {V_odd, V_buffer[5:1]};
+					U_buffer <= {U_odd, U_buffer[5:1]};
 					SRAM_write_data <= {G_odd, B_odd};
 					//V_buffer[5] <= V_odd;	
 				end
@@ -341,14 +341,10 @@ always @(posedge Clock or negedge Resetn) begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address <= init_RGB_address + RGB_count;
 					RGB_count <= RGB_count + 1'd1;
-					// SRAM_we_n <= 1'b0;
 					SRAM_write_data <= {G_odd, B_odd};
-					U_odd <= {SRAM_read_data[7:0]};
-					U_buffer <= {SRAM_read_data[15:8], U_buffer[5:1]};
-					//U_buffer[5] <= {SRAM_read_data[15:8]};
+
+					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end else begin					
-					U_buffer <= {U_odd, U_buffer[5:1]};
-					//U_buffer[5] <= U_odd;
 					SRAM_we_n <= 1'b1;
 				end
 			end
