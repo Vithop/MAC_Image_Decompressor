@@ -115,12 +115,12 @@ always_comb begin
 		Op6 = 31'd159;
 		V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_U_PRIME) begin
-		Op1 = SRAM_read_data[15:8] + U_buffer[1];
+		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
-		Op3 = U_buffer[5] + U_buffer[2];
+		Op3 = U_buffer[4] + U_buffer[1];
 		Op4 = 31'd52;
-		Op5 = U_buffer[4] + U_buffer[3];
-		Op6 = 31'd159;
+		Op5 = U_buffer[3] + U_buffer[2];
+		Op6 = 31'd159;	
 		U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_LI_CALC_U) begin
 		Op1 = U_buffer[5] + U_buffer[0];
@@ -261,6 +261,9 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_CALC_FIRST_RB:begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_address = intit_V_address + UV_count;
+				end else begin
+					Y_count <= Y_count + 1'd1;
+					SRAM_address = intit_Y_address + Y_count;
 				end
 				SRAM_we_n <= 1'b1;
 				M1_state <= S_M1_CALC_FIRST_G;
@@ -269,9 +272,6 @@ always @(posedge Clock or negedge Resetn) begin
 				if(read_UV_flag == 1'b1) begin
 					UV_count <= UV_count + 1'd1;
 					SRAM_address = intit_U_address + UV_count;
-				end else begin
-					Y_count <= Y_count + 1'd1;
-					SRAM_address = intit_Y_address + Y_count;
 				end
 				M1_state <= S_M1_CALC_SECOND_RB;
 			end
@@ -300,9 +300,9 @@ always @(posedge Clock or negedge Resetn) begin
 
 					SRAM_write_data <= {R_even, G_even};
 				end else begin
-					Y_buffer[0] <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 					V_buffer <= {V_odd, V_buffer[5:1]};
 					SRAM_write_data <= {B_even, R_odd};
+					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
 
 			end
@@ -324,12 +324,6 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_U_PRIME:begin
-				U_buffer[0] <= U_buffer[1];
-				U_buffer[1] <= U_buffer[2];
-				U_buffer[2] <= U_buffer[3];
-				U_buffer[3] <= U_buffer[4];
-				U_buffer[4] <= U_buffer[5];
-
 				read_UV_flag <= ~read_UV_flag;
 				
 				if (Y_count == 16'd38396) begin
