@@ -378,24 +378,27 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {B_even, R_odd};
+				if (Y_count != 16'd38401) begin
+					V_buffer <= {V_odd,V_buffer[5:1]};	
+					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+				end
 				
 				M1_state <= S_M1_LO_WRITE_BR;
 			end
 			S_M1_LO_WRITE_BR:begin
 
-				if (Y_count != 16'd38401) begin
-					V_buffer <= {V_odd,V_buffer[5:1]};	
-					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
-				end
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {G_odd, B_odd};
-			
+				
+				if (Y_count != 16'd38401) begin
+					U_buffer <= {U_odd,U_buffer[5:1]};
+				end
+
 				M1_state <= S_M1_LO_WRITE_GB;
 			end
 			S_M1_LO_WRITE_GB:begin
 				if (Y_count != 16'd38401) begin
-					U_buffer <= {U_odd,U_buffer[5:1]};
 					M1_state <= S_M1_LO_CALC_FIRST_RB;
 				end else begin
 					M1_state <= S_M1_IDLE;
