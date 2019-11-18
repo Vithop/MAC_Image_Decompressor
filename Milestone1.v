@@ -83,6 +83,12 @@ assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 assign result_c = {temp_c[31:0]};
 
+//Debuging values from SRAM READ
+logic [7:0] Read_byte1;
+logic [7:0] Read_byte2;
+assign Read_byte1 = SRAM_read_data[7:0];
+assign Read_byte2 = SRAM_read_data[15:8];
+
 always_comb begin
 	if(M1_state == S_M1_CALC_V_PRIME)begin
 		Op1 = SRAM_read_data[15:8] + V_buffer[1];
