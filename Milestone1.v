@@ -91,27 +91,27 @@ assign Read_byte2 = SRAM_read_data[15:8];
 
 always_comb begin
 	if(M1_state == S_M1_CALC_V_PRIME)begin
-		Op1 = SRAM_read_data[15:8] + V_buffer[1];
+		Op1 = V_buffer[5] + V_buffer[0];
 		Op2 = 31'd21;
-		Op3 = V_buffer[5] + V_buffer[2];
+		Op3 = V_buffer[4] + V_buffer[1];
 		Op4 = 31'd52;
-		Op5 = V_buffer[4] + V_buffer[3];
+		Op5 = V_buffer[3] + V_buffer[2];
 		Op6 = 31'd159;
 		V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if(M1_state == S_M1_LI_CALC_V)begin
-		Op1 = SRAM_read_data[15:8] + V_buffer[1];
+		Op1 = V_buffer[5] + V_buffer[0];
 		Op2 = 31'd21;
-		Op3 = SRAM_read_data[7:0] + V_buffer[2];
+		Op3 = V_buffer[4] + V_buffer[1];
 		Op4 = 31'd52;
-		Op5 = V_buffer[4] + V_buffer[3];
+		Op5 = V_buffer[3] + V_buffer[2];
 		Op6 = 31'd159;
 		V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if(M1_state == S_M1_LO_WRITE_BR)begin
-		Op1 = V_odd + V_buffer[1];
+		Op1 = V_buffer[5] + V_buffer[0];
 		Op2 = 31'd21;
-		Op3 = V_buffer[5] + V_buffer[2];
+		Op3 = V_buffer[4] + V_buffer[1];
 		Op4 = 31'd52;
-		Op5 = V_buffer[4] + V_buffer[3];
+		Op5 = V_buffer[3] + V_buffer[2];
 		Op6 = 31'd159;
 		V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_U_PRIME) begin
@@ -123,20 +123,20 @@ always_comb begin
 		Op6 = 31'd159;
 		U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_LI_CALC_U) begin
-		Op1 = SRAM_read_data[15:8] + U_buffer[1];
+		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
-		Op3 = SRAM_read_data[7:0] + U_buffer[2];
+		Op3 = U_buffer[4] + U_buffer[1];
 		Op4 = 31'd52;
-		Op5 = U_buffer[4] + U_buffer[3];
+		Op5 = U_buffer[3] + U_buffer[2];
 		Op6 = 31'd159;			
 		U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_LO_WRITE_GB) begin
-		Op1 = U_odd + U_buffer[1];
+		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
-		Op3 = U_buffer[5] + U_buffer[2];
+		Op3 = U_buffer[4] + U_buffer[1];
 		Op4 = 31'd52;
-		Op5 = U_buffer[4] + U_buffer[3];
-		Op6 = 31'd159;			
+		Op5 = U_buffer[3] + U_buffer[2];
+		Op6 = 31'd159;				
 		U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB) begin
 		Op1 = Y_buffer[1] - 31'd16;
@@ -153,13 +153,13 @@ always_comb begin
 		Op3 = U_prime - 31'd128;
 		Op4 = 31'd132251;
 		Op5 = V_prime - 31'd128;
-		Op3 = U_buffer[2] - 31'd128;
 		Op6 = 31'd104595;
 		R_odd = (result_a + result_c) >>> 16;
 		B_odd = (result_a + result_b) >>> 16;
 	end else if (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) begin
 		Op1 = Y_buffer[1] - 31'd16;
 		Op2 = 31'd76284;
+		Op3 = U_buffer[2] - 31'd128;
 		Op4 = 31'd25624;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd53281;
