@@ -34,5 +34,10 @@ add wave -divider {Multiplier Results}
 add wave -decimal uut/M1_unit/result_a
 add wave -decimal uut/M1_unit/result_b
 add wave -decimal uut/M1_unit/result_c
-add wave -decimal uut/M1_unit/temp_a
+add wave -decimal uut/M1_unit/Op1
+add wave -decimal uut/M1_unit/Op2
+add wave -decimal uut/M1_unit/Op3
+add wave -decimal uut/M1_unit/Op4
+add wave -decimal uut/M1_unit/Op5
+add wave -decimal uut/M1_unit/Op6
 
