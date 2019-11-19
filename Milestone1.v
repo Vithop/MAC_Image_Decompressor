@@ -203,19 +203,21 @@ always @(posedge Clock or negedge Resetn) begin
 					M1_state <= S_M1_LI_FIRST_READ_V;
 					SRAM_address <= intit_V_address;
 					RGB_count <= 16'd0;
-					Y_count <= 16'd1;
-					UV_count <= 16'd1;
+					Y_count <= 16'd0;
+					UV_count <= 16'd0;
 				end
 			end
 			//****START OF LEAD IN CYCLES
 			S_M1_LI_FIRST_READ_V:begin
-				SRAM_address = intit_U_address;
+				SRAM_address = intit_U_address + UV_count;
+				UV_count <= UV_count + 16'd1;
 				SRAM_we_n <= 1'b1;
 				M1_state <= S_M1_LI_FIRST_READ_U;
 
 			end
 			S_M1_LI_FIRST_READ_U:begin
-				SRAM_address = intit_Y_address;
+				SRAM_address = intit_Y_address + Y_count;
+				Y_count <= Y_count + 16'd1;
 				M1_state <= S_M1_LI_FIRST_READ_Y;
 			end
 			S_M1_LI_FIRST_READ_Y:begin
@@ -326,7 +328,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_CALC_U_PRIME:begin
 				read_UV_flag <= ~read_UV_flag;
 				
-				if (Y_count == 16'd38396) begin
+				if ((Y_count % 160) == 158) begin
 					M1_state <= S_M1_LO_CALC_FIRST_RB;
 				end else begin
 					M1_state <= S_M1_CALC_FIRST_RB;
@@ -344,7 +346,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LO_CALC_FIRST_RB:begin
 				SRAM_we_n <= 1'b1;
-				if (Y_count != 16'd38400) begin
+				if ((Y_count % 160) != 0) begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
 				end else begin
@@ -368,7 +370,7 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {B_even, R_odd};
-				if (Y_count != 16'd38401) begin
+				if ((Y_count % 160) != 0) begin
 					V_buffer <= {V_odd,V_buffer[5:1]};	
 					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
@@ -381,17 +383,20 @@ always @(posedge Clock or negedge Resetn) begin
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {G_odd, B_odd};
 				
-				if (Y_count != 16'd38401) begin
+				if ((Y_count % 160) != 0) begin
 					U_buffer <= {U_odd,U_buffer[5:1]};
 				end
 
 				M1_state <= S_M1_LO_WRITE_GB;
 			end
 			S_M1_LO_WRITE_GB:begin
-				if (Y_count != 16'd38401) begin
-					M1_state <= S_M1_LO_CALC_FIRST_RB;
-				end else begin
+				if (Y_count == 31'd38401) begin
 					M1_state <= S_M1_IDLE;
+				end else if((Y_count % 160) != 0) begin
+					SRAM_address <= intit_V_address + UV_count;
+					M1_state <= S_M1_LI_FIRST_READ_V;
+				end else begin
+					M1_state <= S_M1_CALC_FIRST_RB;
 				end	
 				SRAM_we_n <= 1'b1;
 			end
