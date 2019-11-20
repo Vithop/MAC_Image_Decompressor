@@ -87,6 +87,43 @@ assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 assign result_c = {temp_c[31:0]};
 
+assign V_prime = (M1_state == S_M1_CALC_V_PRIME || M1_state == S_M1_LI_CALC_V || M1_state == S_M1_LO_WRITE_BR) ? (result_a - result_b + result_c + 32'd128) >>> 8 : V_prime;
+assign U_prime = (M1_state == S_M1_CALC_U_PRIME || M1_state == S_M1_LI_CALC_U || M1_state == S_M1_LO_WRITE_GB) ? (result_a - result_b + result_c + 32'd128) >>> 8 : U_prime;
+
+assign R_temp = (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB || M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB) ? (result_a + result_c) : R_temp;
+assign B_temp = (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB || M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB) ? (result_a + result_b) : B_temp;
+
+assign R_even = (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB) 
+			? (R_temp[31] == 1'd1)
+				? 8'd0
+				: |R_temp[30:24] ? 8'd255 : R_temp >>> 16
+			: R_even;
+
+assign B_even = (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB) 
+			? (B_temp[31] == 1'd1)
+				? 8'd0
+				: |B_temp[30:24] ? 8'd255 : B_temp >>> 16
+			: B_even;
+
+assign R_odd = (M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB)
+				? (R_temp[31] == 1'd1)
+					? 8'd0
+					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16
+				: R_odd;
+
+assign B_odd = (M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB)
+				? (B_temp[31] == 1'd1)
+					? 8'd0
+					: |B_temp[30:24] ? 8'd255 : B_temp >>> 16
+				: B_odd;
+
+assign G_temp  = (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) ? (result_a - result_b - result_c) : G_temp;
+assign G_even = (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G)
+				? (G_temp[31] == 1'd1)
+					? 8'd0
+					: |G_temp[30:24] ? 8'd255 : G_temp >>> 16
+				: G_even;
+
 //Debuging values from SRAM READ
 logic [7:0] Read_byte1;
 logic [7:0] Read_byte2;
@@ -101,7 +138,6 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = V_buffer[3] + V_buffer[2];
 		Op6 = 31'd159;
-		V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_U_PRIME || M1_state == S_M1_LI_CALC_U || M1_state == S_M1_LO_WRITE_GB) begin
 		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
@@ -109,7 +145,6 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = U_buffer[3] + U_buffer[2];
 		Op6 = 31'd159;	
-		U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB) begin
 		Op1 = Y_buffer[1] - 31'd16;
 		Op2 = 31'd76284;
@@ -117,16 +152,6 @@ always_comb begin
 		Op4 = 31'd132251;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd104595;
-		R_temp = (result_a + result_c);
-		B_temp = (result_a + result_b);
-
-		R_even = (R_temp[31] == 1'd1)
-					? 8'd0
-					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
-
-		B_even = (B_temp[31] == 1'd1)
-					? 8'd0
-					: |B_temp[30:24] ? 8'd255 : B_temp >>> 16;
 	end else if (M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB) begin
 		Op1 = Y_buffer[0] - 31'd16;
 		Op2 = 31'd76284;
@@ -134,16 +159,6 @@ always_comb begin
 		Op4 = 31'd132251;
 		Op5 = V_prime - 31'd128;
 		Op6 = 31'd104595;
-		R_temp = (result_a + result_c);
-		B_temp = (result_a + result_b);
-
-		R_odd = (R_temp[31] == 1'd1)
-					? 8'd0
-					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
-
-		B_odd = (B_temp[31] == 1'd1)
-					? 8'd0
-					: |B_temp[30:24] ? 8'd255 : B_temp >>> 16;
 	end else if (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) begin
 		Op1 = Y_buffer[1] - 31'd16;
 		Op2 = 31'd76284;
@@ -151,10 +166,7 @@ always_comb begin
 		Op4 = 31'd25624;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd53281;
-		G_temp  = (result_a - result_b - result_c);
-		G_even = (G_temp[31] == 1'd1)
-					? 8'd0
-					: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
+		
 	end else if (M1_state == S_M1_CALC_SECOND_G || M1_state == S_M1_LO_CALC_SECOND_G) begin
 		Op1 = Y_buffer[0] - 31'd16;
 		Op2 = 31'd76284;
@@ -162,10 +174,10 @@ always_comb begin
 		Op4 = 31'd25624;
 		Op5 = V_prime - 31'd128;
 		Op6 = 31'd53281;
-		G_temp  = (result_a - result_b - result_c);
-		G_odd = (G_temp[31] == 1'd1)
-					? 8'd0
-					: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
+		// G_temp  = (result_a - result_b - result_c);
+		// G_odd = (G_temp[31] == 1'd1)
+		// 			? 8'd0
+		// 			: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
 	end else begin
 		Op1 = 31'd0;
 		Op2 = 31'd0;
@@ -173,6 +185,17 @@ always_comb begin
 		Op4 = 31'd0;
 		Op5 = 31'd0;
 		Op6 = 31'd0;
+		// V_prime = 31'd0;
+		// U_prime = 31'd0;
+		// R_temp = 8'd0;
+		// B_temp = 8'd0;
+		// G_temp = 8'd0;
+		// R_even = 8'd0;
+		// B_even = 8'd0;
+		// G_even = 8'd0;
+		// R_odd =  8'd0;
+		// B_odd =  8'd0;
+		// G_odd =  8'd0;
 	end
 
 end
@@ -239,7 +262,10 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LI_U1;
 			end
 			S_M1_LI_U1:begin
-				Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+				// Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+				Y_buffer[1] <= SRAM_read_data[15:8];
+				Y_buffer[0] <= SRAM_read_data[7:0];
+				
 				M1_state <= S_M1_LI_Y1;
 			end
 			S_M1_LI_Y1:begin
@@ -298,7 +324,8 @@ always @(posedge Clock or negedge Resetn) begin
 				end else begin
 					V_buffer <= {V_odd, V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2], V_buffer[1]};
 					SRAM_write_data <= {B_even, R_odd};
-					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+					Y_buffer[1] <= SRAM_read_data[15:8];
+					Y_buffer[0] <= SRAM_read_data[7:0];
 				end
 
 			end
@@ -333,7 +360,8 @@ always @(posedge Clock or negedge Resetn) begin
 					RGB_count <= RGB_count + 1'd1;
 					SRAM_write_data <= {G_odd, B_odd};
 
-					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+					Y_buffer[1] <= SRAM_read_data[15:8];
+					Y_buffer[0] <= SRAM_read_data[7:0];
 				end else begin					
 					SRAM_we_n <= 1'b1;
 				end
@@ -365,7 +393,8 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_write_data <= {B_even, R_odd};
 				if ((Y_count != 31'd38401) && (LP_flag == 1'b0)) begin
 					V_buffer <= {V_odd,V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2], V_buffer[1]};	
-					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
+					Y_buffer[1] <= SRAM_read_data[15:8];
+					Y_buffer[0] <= SRAM_read_data[7:0];
 				end
 				
 				M1_state <= S_M1_LO_WRITE_BR;
