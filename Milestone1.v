@@ -67,6 +67,7 @@ logic [7:0] V_buffer [5:0];
 logic [7:0] Y_buffer [1:0];
 
 logic read_UV_flag;
+logic LP_flag;
 
 //RGB Values
 logic [7:0] R_even;
@@ -194,7 +195,7 @@ always @(posedge Clock or negedge Resetn) begin
 		RGB_count <= 16'd0;
 		Y_count <= 16'd0;
 		UV_count <= 16'd0;
-		
+		LP_flag <= 1'b0;
 		M1_state <= S_M1_IDLE;
 	end	else begin
 		case(M1_state)
@@ -346,12 +347,11 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LO_CALC_FIRST_RB:begin
 				SRAM_we_n <= 1'b1;
-				if ((Y_count % 160) != 0) begin
+				if ((Y_count != 31'd38401)  && (LP_flag == 1'b0))begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
-				end else begin
-					Y_count <= Y_count + 16'd1;
 				end
+				
 				M1_state <= S_M1_LO_CALC_FIRST_G;
 			end
 			S_M1_LO_CALC_FIRST_G:begin
@@ -370,7 +370,7 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {B_even, R_odd};
-				if ((Y_count % 160) != 0) begin
+				if ((Y_count != 31'd38401) && (LP_flag == 1'b0)) begin
 					V_buffer <= {V_odd,V_buffer[5:1]};	
 					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
@@ -383,7 +383,7 @@ always @(posedge Clock or negedge Resetn) begin
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {G_odd, B_odd};
 				
-				if ((Y_count % 160) != 0) begin
+				if ((Y_count != 31'd38401)  && (LP_flag == 1'b0)) begin
 					U_buffer <= {U_odd,U_buffer[5:1]};
 				end
 
@@ -392,11 +392,15 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_LO_WRITE_GB:begin
 				if (Y_count == 31'd38401) begin
 					M1_state <= S_M1_IDLE;
-				end else if((Y_count % 160) != 0) begin
+				end else if(LP_flag == 1'b1)begin
+					LP_flag <= 1'b0;
 					SRAM_address <= intit_V_address + UV_count;
 					M1_state <= S_M1_LI_FIRST_READ_V;
+				end else if((Y_count % 160) == 0) begin
+					LP_flag <= 1'b1;
+					M1_state <= S_M1_LO_CALC_FIRST_RB;
 				end else begin
-					M1_state <= S_M1_CALC_FIRST_RB;
+					M1_state <= S_M1_LO_CALC_FIRST_RB;
 				end	
 				SRAM_we_n <= 1'b1;
 			end
