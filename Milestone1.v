@@ -329,7 +329,7 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M1_CALC_U_PRIME:begin
 				read_UV_flag <= ~read_UV_flag;
 				
-				if ((Y_count % 160) == 158) begin
+				if ((Y_count % 160) == 157) begin
 					M1_state <= S_M1_LO_CALC_FIRST_RB;
 				end else begin
 					M1_state <= S_M1_CALC_FIRST_RB;
@@ -378,7 +378,6 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_WRITE_BR;
 			end
 			S_M1_LO_WRITE_BR:begin
-
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {G_odd, B_odd};
