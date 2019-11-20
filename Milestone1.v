@@ -243,11 +243,11 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LI_Y1;
 			end
 			S_M1_LI_Y1:begin
-				V_buffer <= {SRAM_read_data[7:0], SRAM_read_data[15:8], V_buffer[5:2]};
+				V_buffer <= {SRAM_read_data[7:0], SRAM_read_data[15:8], V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2]};
 				M1_state <= S_M1_LI_CALC_V;
 			end
 			S_M1_LI_CALC_V:begin
-				U_buffer <= {SRAM_read_data[7:0], SRAM_read_data[15:8], U_buffer[5:2]};
+				U_buffer <= {SRAM_read_data[7:0], SRAM_read_data[15:8], U_buffer[5], U_buffer[4], U_buffer[3], U_buffer[2]};
 				M1_state <= S_M1_LI_CALC_U;
 			end
 			S_M1_LI_CALC_U:begin
@@ -292,11 +292,11 @@ always @(posedge Clock or negedge Resetn) begin
 
 				if(read_UV_flag == 1'b1) begin
 					V_odd <= {SRAM_read_data[7:0]};
-					V_buffer <= {SRAM_read_data[15:8], V_buffer[5:1]};
+					V_buffer <= {SRAM_read_data[15:8], V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2], V_buffer[1]};
 
 					SRAM_write_data <= {R_even, G_even};
 				end else begin
-					V_buffer <= {V_odd, V_buffer[5:1]};
+					V_buffer <= {V_odd, V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2], V_buffer[1]};
 					SRAM_write_data <= {B_even, R_odd};
 					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
@@ -312,9 +312,9 @@ always @(posedge Clock or negedge Resetn) begin
 				if(read_UV_flag == 1'b1) begin
 					SRAM_write_data <= {B_even, R_odd};
 					U_odd <= {SRAM_read_data[7:0]};
-					U_buffer <= {SRAM_read_data[15:8], U_buffer[5:1]};					
+					U_buffer <= {SRAM_read_data[15:8], U_buffer[5], U_buffer[4], U_buffer[3], U_buffer[2], U_buffer[1]};					
 				end else begin
-					U_buffer <= {U_odd, U_buffer[5:1]};
+					U_buffer <= {U_odd, U_buffer[5], U_buffer[4], U_buffer[3], U_buffer[2], U_buffer[1]};
 					SRAM_write_data <= {G_odd, B_odd};
 					//V_buffer[5] <= V_odd;	
 				end
@@ -364,7 +364,7 @@ always @(posedge Clock or negedge Resetn) begin
 				RGB_count <= RGB_count + 1'd1;
 				SRAM_write_data <= {B_even, R_odd};
 				if ((Y_count != 31'd38401) && (LP_flag == 1'b0)) begin
-					V_buffer <= {V_odd,V_buffer[5:1]};	
+					V_buffer <= {V_odd,V_buffer[5], V_buffer[4], V_buffer[3], V_buffer[2], V_buffer[1]};	
 					Y_buffer <= {SRAM_read_data[15:8], SRAM_read_data[7:0]};
 				end
 				
@@ -376,7 +376,7 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_write_data <= {G_odd, B_odd};
 				
 				if ((Y_count != 31'd38401)  && (LP_flag == 1'b0)) begin
-					U_buffer <= {U_odd,U_buffer[5:1]};
+					U_buffer <= {U_odd,U_buffer[5], U_buffer[4], U_buffer[3], U_buffer[2], U_buffer[1]};
 				end
 
 				M1_state <= S_M1_LO_WRITE_GB;
