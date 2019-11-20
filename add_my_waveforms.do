@@ -16,6 +16,8 @@ add wave -divider {some label for my divider}
 add wave uut/SRAM_we_n
 add wave -decimal uut/SRAM_write_data
 add wave -decimal uut/SRAM_read_data
+add wave -decimal uut/M1_unit/Read_byte1
+add wave -decimal uut/M1_unit/Read_byte2
 add wave -divider {Calculated Values}
 add wave -decimal uut/M1_unit/U_buffer
 add wave -decimal uut/M1_unit/V_buffer
@@ -34,5 +36,10 @@ add wave -divider {Multiplier Results}
 add wave -decimal uut/M1_unit/result_a
 add wave -decimal uut/M1_unit/result_b
 add wave -decimal uut/M1_unit/result_c
-add wave -decimal uut/M1_unit/temp_a
+add wave -decimal uut/M1_unit/Op1
+add wave -decimal uut/M1_unit/Op2
+add wave -decimal uut/M1_unit/Op3
+add wave -decimal uut/M1_unit/Op4
+add wave -decimal uut/M1_unit/Op5
+add wave -decimal uut/M1_unit/Op6
 

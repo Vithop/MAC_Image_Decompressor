@@ -35,7 +35,7 @@ initial block starts on line 228)
 `define COMPARE_FILE_NAME "cat_in.ppm"
 
 //// for milestone 1
-`define INPUT_FILE_NAME "cat.sram_d0"
+`define INPUT_FILE_NAME "cat.sram_d1"
 
 //// for milestone 2
 //`define INPUT_FILE_NAME "motorcycle.sram_d2"
