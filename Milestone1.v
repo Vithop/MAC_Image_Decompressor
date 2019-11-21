@@ -117,12 +117,20 @@ assign B_odd = (M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECO
 					: |B_temp[30:24] ? 8'd255 : B_temp >>> 16
 				: B_odd;
 
-assign G_temp  = (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) ? (result_a - result_b - result_c) : G_temp;
+assign G_temp  = (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G || M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) ? (result_a - result_b - result_c) : G_temp;
+
+assign G_odd = (M1_state == S_M1_CALC_SECOND_G || M1_state == S_M1_LO_CALC_SECOND_G)
+				? (G_temp[31] == 1'd1)
+					? 8'd0
+					: |G_temp[30:24] ? 8'd255 : G_temp >>> 16
+				: G_odd;
+
 assign G_even = (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G)
 				? (G_temp[31] == 1'd1)
 					? 8'd0
 					: |G_temp[30:24] ? 8'd255 : G_temp >>> 16
 				: G_even;
+				
 
 //Debuging values from SRAM READ
 logic [7:0] Read_byte1;
