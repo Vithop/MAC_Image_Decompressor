@@ -185,17 +185,6 @@ always_comb begin
 		Op4 = 31'd0;
 		Op5 = 31'd0;
 		Op6 = 31'd0;
-		// V_prime = 31'd0;
-		// U_prime = 31'd0;
-		// R_temp = 8'd0;
-		// B_temp = 8'd0;
-		// G_temp = 8'd0;
-		// R_even = 8'd0;
-		// B_even = 8'd0;
-		// G_even = 8'd0;
-		// R_odd =  8'd0;
-		// B_odd =  8'd0;
-		// G_odd =  8'd0;
 	end
 
 end

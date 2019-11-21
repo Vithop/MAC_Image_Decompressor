@@ -115,7 +115,7 @@ VGA_SRAM_interface VGA_unit (
 	.VGA_enable(VGA_enable),
    
 	// For accessing SRAM
-	.SRAM_base_address(     ),
+	.SRAM_base_address(18'd146944),
 	.SRAM_address(VGA_SRAM_address),
 	.SRAM_read_data(SRAM_read_data),
    
@@ -229,7 +229,7 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 				// Timeout for 1 sec on UART for detecting if file transmission is finished
 				UART_rx_initialize <= 1'b1;
 				 				
-				VGA_enable <= 1'b1;
+				// VGA_enable <= 1'b1;
 				top_state <= S_ENABLE_M1;
 			end
 		end
@@ -254,15 +254,19 @@ assign VGA_base_address = 18'd146944;
 
 // Give access to SRAM for UART and VGA at appropriate time
 assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
-						? UART_SRAM_address 
-						: (top_state == S_WAIT_M1) ? M1_SRAM_address : VGA_SRAM_address;
+						? UART_SRAM_address
+						: (top_state == S_WAIT_M1 || top_state == S_ENABLE_M1) ? M1_SRAM_address : VGA_SRAM_address;
 
-assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data : UART_SRAM_write_data;
+assign SRAM_write_data = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX))
+						? UART_SRAM_write_data
+						: (top_state == S_WAIT_M1) ? M1_SRAM_write_data : 1'b0 ;
 
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 
 						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n : 1'b1;
+
 assign M1_SRAM_read_data = SRAM_read_data;
+
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (
 	.hex_value(SRAM_read_data[15:12]), 
