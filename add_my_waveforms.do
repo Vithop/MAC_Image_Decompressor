@@ -19,11 +19,11 @@ add wave -decimal uut/SRAM_read_data
 add wave -decimal uut/M1_unit/Read_byte1
 add wave -decimal uut/M1_unit/Read_byte2
 add wave -divider {Calculated Values}
-add wave -decimal uut/M1_unit/U_buffer
 add wave -decimal uut/M1_unit/V_buffer
+add wave -decimal uut/M1_unit/U_buffer
 add wave -decimal uut/M1_unit/Y_buffer
-add wave -decimal uut/M1_unit/U_prime
 add wave -decimal uut/M1_unit/V_prime
+add wave -decimal uut/M1_unit/U_prime
 add wave -divider {Odd RGBs}
 add wave -decimal uut/M1_unit/R_odd
 add wave -decimal uut/M1_unit/G_odd
@@ -36,6 +36,9 @@ add wave -divider {Multiplier Results}
 add wave -decimal uut/M1_unit/result_a
 add wave -decimal uut/M1_unit/result_b
 add wave -decimal uut/M1_unit/result_c
+add wave -decimal uut/M1_unit/R_temp
+add wave -decimal uut/M1_unit/G_temp
+add wave -decimal uut/M1_unit/B_temp
 add wave -decimal uut/M1_unit/Op1
 add wave -decimal uut/M1_unit/Op2
 add wave -decimal uut/M1_unit/Op3
