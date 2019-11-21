@@ -101,7 +101,6 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = V_buffer[3] + V_buffer[2];
 		Op6 = 31'd159;
-		// V_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_U_PRIME || M1_state == S_M1_LI_CALC_U || M1_state == S_M1_LO_WRITE_GB) begin
 		Op1 = U_buffer[5] + U_buffer[0];
 		Op2 = 31'd21;
@@ -109,7 +108,6 @@ always_comb begin
 		Op4 = 31'd52;
 		Op5 = U_buffer[3] + U_buffer[2];
 		Op6 = 31'd159;	
-		// U_prime = (result_a - result_b + result_c + 32'd128) >>> 8;
 	end else if (M1_state == S_M1_CALC_FIRST_RB || M1_state == S_M1_LO_CALC_FIRST_RB) begin
 		Op1 = Y_buffer[1] - 31'd16;
 		Op2 = 31'd76284;
@@ -117,16 +115,6 @@ always_comb begin
 		Op4 = 31'd132251;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd104595;
-		// R_temp = (result_a + result_c);
-		// B_temp = (result_a + result_b);
-
-		// R_even = (R_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
-
-		// B_even = (B_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |B_temp[30:24] ? 8'd255 : B_temp >>> 16;
 	end else if (M1_state == S_M1_CALC_SECOND_RB || M1_state == S_M1_LO_CALC_SECOND_RB) begin
 		Op1 = Y_buffer[0] - 31'd16;
 		Op2 = 31'd76284;
@@ -134,16 +122,6 @@ always_comb begin
 		Op4 = 31'd132251;
 		Op5 = V_prime - 31'd128;
 		Op6 = 31'd104595;
-		// R_temp = (result_a + result_c);
-		// B_temp = (result_a + result_b);
-
-		// R_odd = (R_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
-
-		// B_odd = (B_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |B_temp[30:24] ? 8'd255 : B_temp >>> 16;
 	end else if (M1_state == S_M1_CALC_FIRST_G || M1_state == S_M1_LO_CALC_FIRST_G) begin
 		Op1 = Y_buffer[1] - 31'd16;
 		Op2 = 31'd76284;
@@ -151,10 +129,6 @@ always_comb begin
 		Op4 = 31'd25624;
 		Op5 = V_buffer[2] - 31'd128;
 		Op6 = 31'd53281;
-		// G_temp  = (result_a - result_b - result_c);
-		// G_even = (G_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
 	end else if (M1_state == S_M1_CALC_SECOND_G || M1_state == S_M1_LO_CALC_SECOND_G) begin
 		Op1 = Y_buffer[0] - 31'd16;
 		Op2 = 31'd76284;
@@ -162,10 +136,6 @@ always_comb begin
 		Op4 = 31'd25624;
 		Op5 = V_prime - 31'd128;
 		Op6 = 31'd53281;
-		// G_temp  = (result_a - result_b - result_c);
-		// G_odd = (G_temp[31] == 1'd1)
-		// 			? 8'd0
-		// 			: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
 	end else begin
 		Op1 = 31'd0;
 		Op2 = 31'd0;
