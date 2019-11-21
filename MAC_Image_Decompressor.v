@@ -115,7 +115,7 @@ VGA_SRAM_interface VGA_unit (
 	.VGA_enable(VGA_enable),
    
 	// For accessing SRAM
-	.SRAM_base_address(18'd146944),
+	.SRAM_base_address(VGA_base_address),
 	.SRAM_address(VGA_SRAM_address),
 	.SRAM_read_data(SRAM_read_data),
    
