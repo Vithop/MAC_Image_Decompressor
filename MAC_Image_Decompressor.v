@@ -115,7 +115,7 @@ VGA_SRAM_interface VGA_unit (
 	.VGA_enable(VGA_enable),
    
 	// For accessing SRAM
-	.SRAM_base_address(     ),
+	.SRAM_base_address(VGA_base_address),
 	.SRAM_address(VGA_SRAM_address),
 	.SRAM_read_data(SRAM_read_data),
    
@@ -238,8 +238,9 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 			top_state <= S_WAIT_M1;
 		end
 		S_WAIT_M1: begin
-			if (SRAM_address == 18'd262143) begin
-				M1_enable <= 1'b00;
+			if ((SRAM_address == 18'd262143) && (SRAM_we_n ==  1'b0)) begin
+				M1_enable <= 1'b0;
+				VGA_enable <= 1'b1;   
 				top_state <= S_IDLE;
 			end
 		end
@@ -262,7 +263,9 @@ assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data : UART_SR
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 
 						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n : 1'b1;
+
 assign M1_SRAM_read_data = SRAM_read_data;
+
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (
 	.hex_value(SRAM_read_data[15:12]), 

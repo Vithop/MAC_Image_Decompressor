@@ -87,6 +87,11 @@ assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 assign result_c = {temp_c[31:0]};
 
+assign R_temp = (result_a + result_c);
+assign B_temp = (result_a + result_b);
+assign G_temp = (result_a - result_b - result_c);
+
+
 //Debuging values from SRAM READ
 logic [7:0] Read_byte1;
 logic [7:0] Read_byte2;
@@ -240,8 +245,8 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			//****START OF REPEATING CYCLES
 			S_M1_CALC_FIRST_RB:begin
-				R_temp <= (result_a + result_c);
-				B_temp <= (result_a + result_b);
+				//R_temp <= (result_a + result_c);
+				//B_temp <= (result_a + result_b);
 				R_even = (R_temp[31] == 1'd1)
 					? 8'd0
 					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
@@ -261,7 +266,7 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_FIRST_G:begin
-				G_temp  <= (result_a - result_b - result_c);
+				// G_temp  <= (result_a - result_b - result_c);
 				G_even <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -274,8 +279,8 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_SECOND_RB:begin
-				R_temp <= (result_a + result_c);
-				B_temp <= (result_a + result_b);
+				//R_temp <= (result_a + result_c);
+				// B_temp <= (result_a + result_b);
 
 				R_odd <= (R_temp[31] == 1'd1)
 							? 8'd0
@@ -299,7 +304,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_CALC_SECOND_G:begin
 
-				G_temp  <= (result_a - result_b - result_c);
+				// G_temp  <= (result_a - result_b - result_c);
 				G_odd <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -350,6 +355,7 @@ always @(posedge Clock or negedge Resetn) begin
 					U_buffer[1] <= U_buffer[2];
 					U_buffer[0] <= U_buffer[1];						
 				end else begin
+					U_buffer[5] <= U_odd;
 					U_buffer[4] <= U_buffer[5];
 					U_buffer[3] <= U_buffer[4];
 					U_buffer[2] <= U_buffer[3];
@@ -387,8 +393,8 @@ always @(posedge Clock or negedge Resetn) begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
 				end
-				R_temp <= (result_a + result_c);
-				B_temp <= (result_a + result_b);
+				// R_temp <= (result_a + result_c);
+				// B_temp <= (result_a + result_b);
 				R_even <= (R_temp[31] == 1'd1)
 					? 8'd0
 					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
@@ -399,7 +405,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_FIRST_G;
 			end
 			S_M1_LO_CALC_FIRST_G:begin
-				G_temp  <= (result_a - result_b - result_c);
+				// G_temp  <= (result_a - result_b - result_c);
 				G_even <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -408,8 +414,8 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LO_CALC_SECOND_RB:begin
 
-				R_temp <= (result_a + result_c);
-				B_temp <= (result_a + result_b);
+				// R_temp <= (result_a + result_c);
+				// B_temp <= (result_a + result_b);
 
 				R_odd <= (R_temp[31] == 1'd1)
 							? 8'd0
@@ -428,7 +434,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_LO_CALC_SECOND_G:begin
 
-				G_temp  <= (result_a - result_b - result_c);
+				// G_temp  <= (result_a - result_b - result_c);
 				G_odd <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
