@@ -202,17 +202,17 @@ always @(posedge Clock or negedge Resetn) begin
 					M2_state <= S_M2_LI_READ_BLOCK1_1;
 				end
 			end 
-			S_M2_LI_READ_BLOCK1_1:begin
+			S_M2_FS_LI_READ_BLOCK1_1:begin
 				 SRAM_address <= block_index + A_i + row_address;
 				 A_i <= A_i + 3'd1;
 				 M2_state <= S_M2_LI_READ_BLOCK1_2
 			end
-			S_M2_LI_READ_BLOCK1_2:begin
+			S_M2_FS_LI_READ_BLOCK1_2:begin
 				 SRAM_address <= block_index + A_i + row_address;
 				 A_i <= A_i + 3'd1;
 				 M2_state <= S_M2_READ_BLOCK_ROW;
 			end
-			S_M2_READ_BLOCK_ROW:begin
+			S_M2_FS_READ_BLOCK_ROW:begin
 				 SRAM_address <= block_index + A_i + row_address;
 				 if (A_i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
@@ -220,7 +220,7 @@ always @(posedge Clock or negedge Resetn) begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
 				 end
 			end
-			S_M2_NEXT_ROW:begin
+			S_M2_FS_NEXT_ROW:begin
 				if (SRAM_address == 17'd230399) begin
  					M2_state <= S_M2_LO_READ_BLOCK0;
 				end else begin
