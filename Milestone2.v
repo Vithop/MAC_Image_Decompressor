@@ -55,7 +55,8 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 
 logic [2:0] i;
 logic [2:0] j;
-logic [17:0] block_index
+logic [17:0] block_index;
+logic [17:0] row_address;
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] result_b;
@@ -131,20 +132,42 @@ always @(posedge Clock or negedge Resetn) begin
 					SRAM_write_data <= 16'd0;
 					SRAM_address <= init_PreIDCT_address;
 					block_index <= init_PreIDCT_address;
+					row_address <= 17'd0;
 					i <= 3'd1;
 					j <= 3'd1;
 					M2_state <= S_M2_LI_READ_BLOCK;
 				end
 			end 
-			S_M2_LI_READ_BLOCK_ROW:begin
-				 if (i > 3'd7) begin
+			S_M2_LI_READ_BLOCK1:begin
+				 SRAM_address <= block_index + i + row_address;
+				 i <= i + 3'd1;
+			end
+			S_M2_LI_READ_BLOCK1:begin
+				 SRAM_address <= block_index + i + row_address;
+				 i <= i + 3'd1;
+			end
+			S_M2_READ_BLOCK_ROW:begin
+				 if (i < 3'd7) begin
 				 	i <= i + 3'd1;
+				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				 end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
 				 end
-				 SRAM_address <= block_index + i;
+				 SRAM_address <= block_index + i + row_address;
 			end
 			S_M2_LI_NEXT_ROW:begin
+				if (j < 3'd7) begin
+				 	j <= j + 3'd1;
+				 	i <= 3'd0;
+				 	row_address <= row_address + 17'd320
+				 	M2_state <= S_M2_READ_BLOCK_ROW;
+				 end else begin
+				 	i <= 3'd0;
+				 	j <= 3'd0;
+				 	M2_state <= S_M2_BLOCK_DONE;
+				 end
+			end
+			S_M2_BLOCK_DONE:begin
 				
 			end
 			S_M2_CALC_stuff:begin
