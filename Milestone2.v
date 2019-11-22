@@ -49,17 +49,18 @@ get_c_values get_c_values_inst1(
 	.C_values(matrix_c_val1),
 	);
 
-logic [8:0] DP_address_a, DP_address_b;
-logic [7:0] write_data_b [1:0];
+logic [6:0] DP_address_a, DP_address_b;
+logic [31:0] write_data_a;
+logic [31:0] write_data_b;
 logic write_enable_a;
 logic write_enable_b;
-logic [7:0] read_data_a [1:0];
-logic [7:0] read_data_b [1:0];
+logic [31:0] read_data_a [1:0];
+logic [31:0] read_data_b [1:0];
 // Instantiate RAM0
 dual_port_RAM0 dual_port_RAM_inst0 (
 	.address_a ( DP_address_a ),
 	.address_b ( DP_address_b ),
-	.clock ( CLOCK_I ),
+	.clock ( CLOCK_A_i ),
 	.data_a ( 8'h00 ),
 	.data_b ( 8'h00 ),
 	.wren_a ( write_enable_a ),
@@ -67,26 +68,28 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 	.q_a ( read_data_a[0] ),
 	.q_b ( read_data_b[0] )
 );
-// logic [8:0] DP_address2_a, DP_address2_b;
-// logic [7:0] write_data_b [1:0];
-// logic write_enable_a;
-// logic write_enable_b;
-// logic [7:0] read_data_a [1:0];
-// logic [7:0] read_data_b [1:0];
-// dual_port_RAM1 dual_port_RAM_inst1 (
-// 	.address_a ( read_address1 ),
-// 	.address_b ( write_address1 ),
-// 	.clock ( CLOCK_I ),
-// 	.data_a ( 8'h00 ),
-// 	.data_b ( write_data_1[0] ),
-// 	.wren_a ( 1'b0 ),
-// 	.wren_b ( write_enable_1[0] ),
-// 	.q_a ( read_data_1_a[0] ),
-// 	.q_b ( read_data_1_b[0] )
-// 	);
 
-logic [2:0] i;
-logic [2:0] j;
+logic [6:0] DP_address2_a, DP_address2_b;
+logic [31:0] write_data2_a;
+logic [31:0] write_data2_b;
+logic write_enable2_a;
+logic write_enable2_b;
+logic [7:0] read_data2_a [1:0];
+logic [7:0] read_data2_b [1:0];
+dual_port_RAM1 dual_port_RAM_inst1 (
+	.address_a ( DP_address2_a ),
+	.address_b ( DP_address2_b ),
+	.clock ( CLOCK_A_i ),
+	.data_a ( write_data2_a ),
+	.data_b ( write_data2_b ),
+	.wren_a ( write_enable2_a ),
+	.wren_b ( write_enable2_b ),
+	.q_a ( read_data2_a ),
+	.q_b ( read_data2_b )
+	);
+
+logic [2:0] A_i;
+logic [2:0] A_j;
 logic [17:0] block_index;
 logic [17:0] row_address;
 
@@ -95,8 +98,12 @@ logic [15:0] matrix_A_row [7:0];
 logic [7:0] matrix_A_val;
 // logic [7:0] matrix_A_val_2;
 
-logic [31:0] temp_matrix_val_0;
-logic [31:0] temp_matrix_val_1;
+// B will be the result matrix
+logic [2:0] B_i;
+logic [2:0] B_j;
+logic [31:0] temp_B_val_0;
+logic [31:0] temp_B_val_1;
+
 
 // For Multiplier
 logic [31:0] result_a;
@@ -161,8 +168,8 @@ always @(posedge Clock or negedge Resetn) begin
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 16'd0;
 		block_index <= init_PreIDCT_address;
-		i <= 3'd0;
-		j <= 3'd0;
+		A_i <= 3'd0;
+		A_j <= 3'd0;
 		M2_state <= S_M2_IDLE;
 	end
 	else 
@@ -174,24 +181,24 @@ always @(posedge Clock or negedge Resetn) begin
 					SRAM_address <= init_PreIDCT_address;
 					block_index <= init_PreIDCT_address;
 					row_address <= 17'd0;
-					i <= 3'd1;
-					j <= 3'd1;
+					A_i <= 3'd1;
+					A_j <= 3'd1;
 					M2_state <= S_M2_LI_READ_BLOCK1_1;
 				end
 			end 
 			S_M2_LI_READ_BLOCK1_1:begin
-				 SRAM_address <= block_index + i + row_address;
-				 i <= i + 3'd1;
+				 SRAM_address <= block_index + A_i + row_address;
+				 A_i <= A_i + 3'd1;
 				 M2_state <= S_M2_LI_READ_BLOCK1_2
 			end
 			S_M2_LI_READ_BLOCK1_2:begin
-				 SRAM_address <= block_index + i + row_address;
-				 i <= i + 3'd1;
+				 SRAM_address <= block_index + A_i + row_address;
+				 A_i <= A_i + 3'd1;
 				 M2_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_READ_BLOCK_ROW:begin
-				 SRAM_address <= block_index + i + row_address;
-			 	i <= i + 3'd1;
+				 SRAM_address <= block_index + A_i + row_address;
+			 	A_i <= A_i + 3'd1;
 				matrix_A_row[0] <= matrix_A_val;
 				matrix_A_row[1] <= matrix_A_val[0];
 				matrix_A_row[2] <= matrix_A_val[1];
@@ -201,10 +208,10 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[6] <= matrix_A_val[5];
 				matrix_A_row[7] <= matrix_A_val[6];
 				
-				temp_matrix_val_0 <= temp_matrix_val_0 + result_a;
-				temp_matrix_val_1 <= temp_matrix_val_1 + result_b;
+				temp_B_val_0 <= temp_B_val_0 + result_a;
+				temp_B_val_1 <= temp_B_val_1 + result_b;
 
-				 if (i < 3'd6) begin
+				 if (A_i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				 end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
@@ -214,19 +221,19 @@ always @(posedge Clock or negedge Resetn) begin
 				if (SRAM_address == 17'd230399) begin
  					M2_state <= S_M2_LO_READ_BLOCK0;
 				end else begin
-					SRAM_address <= block_index + i + row_address;
+					SRAM_address <= block_index + A_i + row_address;
 				 	M2_state <= S_M2_READ_BLOCK_ROW;			 	
 				end
-				if (i == 3'd7) begin
-				 	i <= 3'd0;
+				if (A_i == 3'd7) begin
+				 	A_i <= 3'd0;
 				end else begin
-					i <= i + 3'd1;
+					A_i <= A_i + 3'd1;
 				end
-				if (j < 3'd7) begin
-				 	j <= j + 3'd1;
+				if (A_j < 3'd7) begin
+				 	A_j <= A_j + 3'd1;
 				 	row_address <= row_address + 17'd320
 				 end else begin
-				 	j <= 3'd0;
+				 	A_j <= 3'd0;
 					row_address <= 17'd0;
 				 	if(((block_index + 17'd8)%17'd320) == 0)begin
 				 		block_index <= block_index + 17'd2248;
