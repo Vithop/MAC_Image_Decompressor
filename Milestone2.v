@@ -229,7 +229,11 @@ always @(posedge Clock or negedge Resetn) begin
 				 	end
 				 end
 			end
-			S_M2_CT_LI_
+			S_M2_CT_LI_READ_VAL1: begin
+				SRAM_address <= block_index + A_i + row_address;
+				 A_i <= A_i + 3'd1;
+				 M2_state <= S_M2_LI_READ_BLOCK1_2
+			end
 			// A_i <= A_i + 3'd1;
 			// 	matrix_A_row[0] <= matrix_A_val;
 			// 	matrix_A_row[1] <= matrix_A_val[0];
