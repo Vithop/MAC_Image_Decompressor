@@ -34,6 +34,20 @@ parameter intit_Y_address = 18'd0,
 		next_row_postIDCT = 18'd160,
 		init_PreIDCT_address = 18'd76800;
 
+logic [2:0] Ic0, Jc0;
+int matrix_c_val0;
+get_c_values get_c_values_inst0(
+	.i(Ic0),
+	.j(Jc0),
+	.C_values(matrix_c_val0),
+	);
+logic [2:0] Ic1, Jc1;
+int matrix_c_val1;
+get_c_values get_c_values_inst1(
+	.i(Ic1),
+	.j(Jc1),
+	.C_values(matrix_c_val1),
+	);
 
 logic [8:0] DP_address_a, DP_address_b;
 logic [7:0] write_data_b [1:0];
