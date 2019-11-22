@@ -35,20 +35,21 @@ parameter intit_Y_address = 18'd0,
 		init_PreIDCT_address = 18'd76800;
 
 
-logic [8:0] read_address, write_address;
+logic [8:0] DP_address_a, DP_address_b;
 logic [7:0] write_data_b [1:0];
-logic write_enable_b [1:0];
+logic write_enable_a;
+logic write_enable_b;
 logic [7:0] read_data_a [1:0];
 logic [7:0] read_data_b [1:0];
 // Instantiate RAM0
 dual_port_RAM0 dual_port_RAM_inst0 (
-	.address_a ( read_address ),
-	.address_b ( write_address ),
+	.address_a ( DP_address_a ),
+	.address_b ( DP_address_b ),
 	.clock ( CLOCK_I ),
 	.data_a ( 8'h00 ),
-	.data_b ( write_data_b[0] ),
-	.wren_a ( 1'b0 ),
-	.wren_b ( write_enable_b[0] ),
+	.data_b ( 8'h00 ),
+	.wren_a ( write_enable_a ),
+	.wren_b ( write_enable_b ),
 	.q_a ( read_data_a[0] ),
 	.q_b ( read_data_b[0] )
 	);
@@ -57,6 +58,11 @@ logic [2:0] i;
 logic [2:0] j;
 logic [17:0] block_index;
 logic [17:0] row_address;
+
+// General Matrix A that will represent S' or T
+logic [15:0] matrix_A_row [7:0];
+logic [7:0] matrix_A_val_1;
+logic [7:0] matrix_A_val_2;
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] result_b;
@@ -135,31 +141,34 @@ always @(posedge Clock or negedge Resetn) begin
 					row_address <= 17'd0;
 					i <= 3'd1;
 					j <= 3'd1;
-					M2_state <= S_M2_LI_READ_BLOCK;
+					M2_state <= S_M2_LI_READ_BLOCK1_1;
 				end
 			end 
-			S_M2_LI_READ_BLOCK1:begin
+			S_M2_LI_READ_BLOCK1_1:begin
 				 SRAM_address <= block_index + i + row_address;
 				 i <= i + 3'd1;
+				 M2_state <= S_M2_LI_READ_BLOCK1_2
 			end
-			S_M2_LI_READ_BLOCK1:begin
+			S_M2_LI_READ_BLOCK1_2:begin
 				 SRAM_address <= block_index + i + row_address;
 				 i <= i + 3'd1;
+				 M2_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_READ_BLOCK_ROW:begin
 				 if (i < 3'd7) begin
 				 	i <= i + 3'd1;
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
+					matrix_A_row[]
 				 end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
 				 end
-				 SRAM_address <= block_index + i + row_address;
+				SRAM_address <= block_index + i + row_address;
 			end
-			S_M2_LI_NEXT_ROW:begin
+			S_M2_NEXT_ROW:begin
 				if (j < 3'd7) begin
 				 	j <= j + 3'd1;
 				 	i <= 3'd0;
-				 	row_address <= row_address + 17'd320
+				 	row_address <= row_address + 17'd320;
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				 end else begin
 				 	i <= 3'd0;
