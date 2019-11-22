@@ -67,26 +67,26 @@ typedef enum logic [4:0]{
 	S_M1_LO_WRITE_BR,
 	S_M1_LO_WRITE_GB
 } Milestone1_state_type;
-/*
+
 typedef enum logic [3:0]{
 	S_M2_IDLE,
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
-	S_M2_
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2_,
 	S_M2_
 } Milestone2_state_type;
-*/
+
 
 `define DEFINE_STATE 1
 `endif
