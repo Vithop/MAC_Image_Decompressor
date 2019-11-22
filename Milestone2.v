@@ -30,6 +30,8 @@ Milestone2_state_type M2_state;
 parameter intit_Y_address = 18'd0,
 		intit_U_address = 18'd38400,
 		intit_V_address = 18'd57600,
+		next_row_preIDCT = 18'd320,
+		next_row_postIDCT = 18'd160,
 		init_PreIDCT_address = 18'd76800;
 
 
@@ -51,7 +53,9 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 	.q_b ( read_data_b[0] )
 	);
 
-
+logic [2:0] i;
+logic [2:0] j;
+logic [17:0] block_index
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] result_b;
@@ -111,15 +115,43 @@ end
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		// reset
-		
+		SRAM_we_n <= 1'b1;
+		SRAM_write_data <= 16'd0;
+		SRAM_address <= 16'd0;
+		block_index <= init_PreIDCT_address;
+		i <= 3'd0;
+		j <= 3'd0;
+		M2_state <= S_M2_IDLE;
 	end
-	else if (Enable) begin
+	else 
 		case(M2_state)
-		S_M2_IDLE: begin
-			
-		end
-		default: M2_state <= S_M2_IDLE;
-	end
+			S_M2_IDLE: begin
+				if (Enable == 1'b1) begin
+					SRAM_we_n <= 1'b1;
+					SRAM_write_data <= 16'd0;
+					SRAM_address <= init_PreIDCT_address;
+					block_index <= init_PreIDCT_address;
+					i <= 3'd1;
+					j <= 3'd1;
+					M2_state <= S_M2_LI_READ_BLOCK;
+				end
+			end 
+			S_M2_LI_READ_BLOCK_ROW:begin
+				 if (i > 3'd7) begin
+				 	i <= i + 3'd1;
+				 end else begin
+				 	M2_state <= S_M2_LI_NEXT_ROW;
+				 end
+				 SRAM_address <= block_index + i;
+			end
+			S_M2_LI_NEXT_ROW:begin
+				
+			end
+			S_M2_CALC_stuff:begin
+				
+			end
+			default: M2_state <= S_M2_IDLE;
+		endcase
 end
 
 
