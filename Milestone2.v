@@ -49,6 +49,7 @@ get_c_values get_c_values_inst1(
 	.C_values(matrix_c_val1),
 	);
 
+
 logic [6:0] DP_address_a, DP_address_b;
 logic [31:0] write_data_a;
 logic [31:0] write_data_b;
@@ -61,8 +62,8 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 	.address_a ( DP_address_a ),
 	.address_b ( DP_address_b ),
 	.clock ( CLOCK_A_i ),
-	.data_a ( 8'h00 ),
-	.data_b ( 8'h00 ),
+	.data_a ( write_data_a ),
+	.data_b ( write_data_b ),
 	.wren_a ( write_enable_a ),
 	.wren_b ( write_enable_b ),
 	.q_a ( read_data_a[0] ),
@@ -170,6 +171,21 @@ always @(posedge Clock or negedge Resetn) begin
 		block_index <= init_PreIDCT_address;
 		A_i <= 3'd0;
 		A_j <= 3'd0;
+
+
+		DP_address_a <= 7'd0;
+		DP_address_b <= 7'd0;
+		write_data_a <= 32'd0;
+		write_data_b <= 32'd0;
+		write_enable_a <= 1'b0;
+		write_enable_b <= 1'b0;
+		DP_address2_a <= 7'd0;
+		DP_address2_b <= 7'd0;
+		write_data2_a <= 32'd0;
+		write_data2_b <= 32'd0;
+		write_enable2_a <= 1'b0;
+		write_enable2_b <= 1'b0;
+
 		M2_state <= S_M2_IDLE;
 	end
 	else 
