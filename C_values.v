@@ -8,8 +8,7 @@ Made by Vithuran Sadagopan
 `default_nettype none
 `endif
 
-module convert_hex_to_seven_segment (
-	input logic [7:0] address,
+module get_c_values (
 	input logic [2:0] i,
 	input logic [2:0] j,
 	output int C_values,
