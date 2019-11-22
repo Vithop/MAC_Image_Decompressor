@@ -52,7 +52,24 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 	.wren_b ( write_enable_b ),
 	.q_a ( read_data_a[0] ),
 	.q_b ( read_data_b[0] )
-	);
+);
+// logic [8:0] DP_address2_a, DP_address2_b;
+// logic [7:0] write_data_b [1:0];
+// logic write_enable_a;
+// logic write_enable_b;
+// logic [7:0] read_data_a [1:0];
+// logic [7:0] read_data_b [1:0];
+// dual_port_RAM1 dual_port_RAM_inst1 (
+// 	.address_a ( read_address1 ),
+// 	.address_b ( write_address1 ),
+// 	.clock ( CLOCK_I ),
+// 	.data_a ( 8'h00 ),
+// 	.data_b ( write_data_1[0] ),
+// 	.wren_a ( 1'b0 ),
+// 	.wren_b ( write_enable_1[0] ),
+// 	.q_a ( read_data_1_a[0] ),
+// 	.q_b ( read_data_1_b[0] )
+// 	);
 
 logic [2:0] i;
 logic [2:0] j;
@@ -155,32 +172,48 @@ always @(posedge Clock or negedge Resetn) begin
 				 M2_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_READ_BLOCK_ROW:begin
-				 if (i < 3'd7) begin
-				 	i <= i + 3'd1;
+				 SRAM_address <= block_index + i + row_address;
+			 	i <= i + 3'd1;
+				 if (i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
-					matrix_A_row[]
+					matrix_A_row[7] <= SRAM_read_data[]
 				 end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
 				 end
-				SRAM_address <= block_index + i + row_address;
 			end
 			S_M2_NEXT_ROW:begin
+				if (SRAM_address == 17'd230399) begin
+ 					M2_state <= S_M2_LO_READ_BLOCK0;
+				end else begin
+					SRAM_address <= block_index + i + row_address;
+				 	M2_state <= S_M2_READ_BLOCK_ROW;			 	
+				end
+				if (i == 3'd7) begin
+				 	i <= 3'd0;
+				end else begin
+					i <= i + 3'd1;
+				end
 				if (j < 3'd7) begin
 				 	j <= j + 3'd1;
-				 	i <= 3'd0;
-				 	row_address <= row_address + 17'd320;
-				 	M2_state <= S_M2_READ_BLOCK_ROW;
+				 	row_address <= row_address + 17'd320
 				 end else begin
-				 	i <= 3'd0;
 				 	j <= 3'd0;
-				 	M2_state <= S_M2_BLOCK_DONE;
+					row_address <= 17'd0;
+				 	if(((block_index + 17'd8)%17'd320) == 0)begin
+				 		block_index <= block_index + 17'd2248;
+				 	end else begin
+				 		block_index <= block_index + 17'd8;				 		
+				 	end
 				 end
 			end
-			S_M2_BLOCK_DONE:begin
-				
+			S_M2_LO_READ_BLOCK0:begin
+				M2_state <= S_M2_LO_READ_BLOCK1;
 			end
-			S_M2_CALC_stuff:begin
-				
+			S_M2_LO_READ_BLOCK1:begin
+				M2_state <= S_M2_LO_READ_BLOCK2;
+			end
+			S_M2_LO_READ_BLOCK2:begin
+				M2_state <= S_M2_IDLE;
 			end
 			default: M2_state <= S_M2_IDLE;
 		endcase
