@@ -78,8 +78,12 @@ logic [17:0] row_address;
 
 // General Matrix A that will represent S' or T
 logic [15:0] matrix_A_row [7:0];
-logic [7:0] matrix_A_val_1;
-logic [7:0] matrix_A_val_2;
+logic [7:0] matrix_A_val;
+// logic [7:0] matrix_A_val_2;
+
+logic [31:0] temp_matrix_val_0;
+logic [31:0] temp_matrix_val_1;
+
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] result_b;
@@ -97,32 +101,32 @@ assign temp_b = (Op3 * Op4);
 assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 always comb begin
-	if(M == )begin
+	if(M2_state == S_M2_READ_BLOCK_ROW)begin
+		Op1 = matrix_A_row[0];
+		Op2 = matrix_C_val0;
+		Op3 = matrix_A_row[0];
+		Op4 = matrix_C_val1;
+	end else if (M2_state == ) begin
 		Op1 = ;
 		Op2 = ;
 		Op3 = ;
 		Op4 = ;
-	end else if (M == ) begin
+	end else if (M2_state == ) begin
 		Op1 = ;
 		Op2 = ;
 		Op3 = ;
 		Op4 = ;
-	end else if (M == ) begin
+	end else if (M2_state == ) begin
 		Op1 = ;
 		Op2 = ;
 		Op3 = ;
 		Op4 = ;
-	end else if (M == ) begin
+	end else if (M2_state == ) begin
 		Op1 = ;
 		Op2 = ;
 		Op3 = ;
 		Op4 = ;
-	end else if (M == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
-	end else if (M == ) begin
+	end else if (M2_state == ) begin
 		Op1 = ;
 		Op2 = ;
 		Op3 = ;
@@ -174,9 +178,20 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_READ_BLOCK_ROW:begin
 				 SRAM_address <= block_index + i + row_address;
 			 	i <= i + 3'd1;
+				matrix_A_row[0] <= matrix_A_val;
+				matrix_A_row[1] <= matrix_A_val[0];
+				matrix_A_row[2] <= matrix_A_val[1];
+				matrix_A_row[3] <= matrix_A_val[2];
+				matrix_A_row[4] <= matrix_A_val[3];
+				matrix_A_row[5] <= matrix_A_val[4];
+				matrix_A_row[6] <= matrix_A_val[5];
+				matrix_A_row[7] <= matrix_A_val[6];
+				
+				temp_matrix_val_0 <= temp_matrix_val_0 + result_a;
+				temp_matrix_val_1 <= temp_matrix_val_1 + result_b;
+
 				 if (i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
-					matrix_A_row[7] <= SRAM_read_data[]
 				 end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
 				 end
