@@ -186,7 +186,7 @@ always @(posedge Clock or negedge Resetn) begin
 					M2_state <= S_M2_LI_READ_BLOCK1_1;
 				end
 			end 
-			S_M2_LI_READ_BLOCK1_1:begin
+			S_M2_LI_:begin
 				 SRAM_address <= block_index + A_i + row_address;
 				 A_i <= A_i + 3'd1;
 				 M2_state <= S_M2_LI_READ_BLOCK1_2
@@ -198,19 +198,6 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_READ_BLOCK_ROW:begin
 				 SRAM_address <= block_index + A_i + row_address;
-			 	A_i <= A_i + 3'd1;
-				matrix_A_row[0] <= matrix_A_val;
-				matrix_A_row[1] <= matrix_A_val[0];
-				matrix_A_row[2] <= matrix_A_val[1];
-				matrix_A_row[3] <= matrix_A_val[2];
-				matrix_A_row[4] <= matrix_A_val[3];
-				matrix_A_row[5] <= matrix_A_val[4];
-				matrix_A_row[6] <= matrix_A_val[5];
-				matrix_A_row[7] <= matrix_A_val[6];
-				
-				temp_B_val_0 <= temp_B_val_0 + result_a;
-				temp_B_val_1 <= temp_B_val_1 + result_b;
-
 				 if (A_i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				 end else begin
@@ -242,8 +229,20 @@ always @(posedge Clock or negedge Resetn) begin
 				 	end
 				 end
 			end
-			S_M2_LO_READ_BLOCK0:begin
-				M2_state <= S_M2_LO_READ_BLOCK1;
+			// A_i <= A_i + 3'd1;
+			// 	matrix_A_row[0] <= matrix_A_val;
+			// 	matrix_A_row[1] <= matrix_A_val[0];
+			// 	matrix_A_row[2] <= matrix_A_val[1];
+			// 	matrix_A_row[3] <= matrix_A_val[2];
+			// 	matrix_A_row[4] <= matrix_A_val[3];
+			// 	matrix_A_row[5] <= matrix_A_val[4];
+			// 	matrix_A_row[6] <= matrix_A_val[5];
+			// 	matrix_A_row[7] <= matrix_A_val[6];
+				
+			// 	temp_B_val_0 <= temp_B_val_0 + result_a;
+			// 	temp_B_val_1 <= temp_B_val_1 + result_b;
+			// S_M2_LO_READ_BLOCK0:begin
+			// 	M2_state <= S_M2_LO_READ_BLOCK1;
 			end
 			S_M2_LO_READ_BLOCK1:begin
 				M2_state <= S_M2_LO_READ_BLOCK2;
