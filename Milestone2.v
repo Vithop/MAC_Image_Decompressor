@@ -55,8 +55,8 @@ logic [31:0] write_data_a;
 logic [31:0] write_data_b;
 logic write_enable_a;
 logic write_enable_b;
-logic [31:0] read_data_a [1:0];
-logic [31:0] read_data_b [1:0];
+logic [31:0] read_data_a;
+logic [31:0] read_data_b;
 // Instantiate RAM0
 dual_port_RAM0 dual_port_RAM_inst0 (
 	.address_a ( DP_address_a ),
@@ -75,8 +75,8 @@ logic [31:0] write_data2_a;
 logic [31:0] write_data2_b;
 logic write_enable2_a;
 logic write_enable2_b;
-logic [7:0] read_data2_a [1:0];
-logic [7:0] read_data2_b [1:0];
+logic [31:0] read_data_a;
+logic [31:0] read_data_b;
 dual_port_RAM1 dual_port_RAM_inst1 (
 	.address_a ( DP_address2_a ),
 	.address_b ( DP_address2_b ),
@@ -187,8 +187,7 @@ always @(posedge Clock or negedge Resetn) begin
 		write_enable2_b <= 1'b0;
 
 		M2_state <= S_M2_IDLE;
-	end
-	else 
+	end	else begin
 		case(M2_state)
 			S_M2_IDLE: begin
 				if (Enable == 1'b1) begin
@@ -296,10 +295,13 @@ always @(posedge Clock or negedge Resetn) begin
 			// 	temp_B_val_1 <= temp_B_val_1 + result_b;
 			// S_M2_LO_READ_BLOCK0:begin
 			// 	M2_state <= S_M2_LO_READ_BLOCK1;
-			end
 			
+			S_M2_WS_START_READ:begin
+				
+			end
 			default: M2_state <= S_M2_IDLE;
 		endcase
+	end
 end
 
 
