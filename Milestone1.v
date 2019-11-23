@@ -40,13 +40,6 @@ logic [63:0] temp_a;
 logic [63:0] temp_b;
 logic [63:0] temp_c;
 
-// logic result_a <= 32'd0;
-// logic result_b <= 32'd0;
-// logic result_c <= 32'd0;
-// logic temp_a <= 63'd0;
-// logic temp_b <= 63'd0;
-// logic temp_c <= 63'd0;
-
 longint Op1;
 longint Op2;
 
@@ -250,8 +243,6 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			//****START OF REPEATING CYCLES
 			S_M1_CALC_FIRST_RB:begin
-				//R_temp <= (result_a + result_c);
-				//B_temp <= (result_a + result_b);
 				R_even = (R_temp[31] == 1'd1)
 					? 8'd0
 					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
@@ -271,7 +262,6 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_FIRST_G:begin
-				// G_temp  <= (result_a - result_b - result_c);
 				G_even <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -284,9 +274,6 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_SECOND_RB:begin
-				//R_temp <= (result_a + result_c);
-				// B_temp <= (result_a + result_b);
-
 				R_odd <= (R_temp[31] == 1'd1)
 							? 8'd0
 							: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
@@ -308,8 +295,6 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M1_CALC_SECOND_G:begin
-
-				// G_temp  <= (result_a - result_b - result_c);
 				G_odd <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -344,7 +329,6 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M1_CALC_V_PRIME:begin
 				V_prime <= (result_a - result_b + result_c + 32'd128) >>> 8;
-				//SRAM_we_n <= 1'b1;
 				SRAM_address <= init_RGB_address + RGB_count;
 				RGB_count <= RGB_count + 1'd1;
 				
@@ -398,8 +382,6 @@ always @(posedge Clock or negedge Resetn) begin
 					SRAM_address = intit_Y_address + Y_count;
 					Y_count <= Y_count + 16'd1;
 				end
-				// R_temp <= (result_a + result_c);
-				// B_temp <= (result_a + result_b);
 				R_even <= (R_temp[31] == 1'd1)
 					? 8'd0
 					: |R_temp[30:24] ? 8'd255 : R_temp >>> 16;
@@ -410,7 +392,6 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_FIRST_G;
 			end
 			S_M1_LO_CALC_FIRST_G:begin
-				// G_temp  <= (result_a - result_b - result_c);
 				G_even <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;
@@ -418,9 +399,6 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_SECOND_RB;
 			end
 			S_M1_LO_CALC_SECOND_RB:begin
-
-				// R_temp <= (result_a + result_c);
-				// B_temp <= (result_a + result_b);
 
 				R_odd <= (R_temp[31] == 1'd1)
 							? 8'd0
@@ -438,8 +416,6 @@ always @(posedge Clock or negedge Resetn) begin
 				M1_state <= S_M1_LO_CALC_SECOND_G;
 			end
 			S_M1_LO_CALC_SECOND_G:begin
-
-				// G_temp  <= (result_a - result_b - result_c);
 				G_odd <= (G_temp[31] == 1'd1)
 							? 8'd0
 							: |G_temp[30:24] ? 8'd255 : G_temp >>> 16;

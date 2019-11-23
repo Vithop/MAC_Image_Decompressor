@@ -114,6 +114,7 @@ logic [17:0] YUV_block_address;
 logic [2:0] YUV_i;
 logic [2:0] YUV_j;
 logic [17:0] YUV_row_address;
+logic Reading_Y_flag;
 // For Multiplier
 logic [31:0] result_a;
 logic [31:0] result_b;
