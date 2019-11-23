@@ -276,10 +276,27 @@ always @(posedge Clock or negedge Resetn) begin
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
 			end
-			S_M2_CT_LI_READ_VAL1: begin
-				SRAM_address <= block_index + A_i + row_address;
-				 A_i <= A_i + 3'd1;
-				 M2_state <= S_M2_LI_READ_BLOCK1_2
+			S_M2_CT_LI_init: begin
+				DP_address_a <=  6'd0;
+				DP_address_b <=  6'd1;
+				A_i <= 3'd0;
+				A_j <= 3'd0;
+				row_address <= 17'd0;
+				M2_state <= S_M2_CT_LI_VAL
+			end
+			S_M2_CT_LI_READ_init: begin
+				DP_address_a <= DP_address_a + 6'd2;
+				DP_address_b <= DP_address_b + 6'd2;
+				M2_state <= S_M2_LI_READ_BLOCK1_2
+			end
+			S_M2_CT_LI_read: begin
+				DP_address_a <= DP_address_a + 6'd2;
+				DP_address_b <= DP_address_b + 6'd2;
+				 if (A_i < 3'd6) begin
+				 	M2_state <= S_M2_READ_BLOCK_ROW;
+				 end else begin
+				 	M2_state <= S_M2_LI_NEXT_ROW;
+				 end
 			end
 			// A_i <= A_i + 3'd1;
 			// 	matrix_A_row[0] <= matrix_A_val;
