@@ -172,13 +172,13 @@ always @(posedge Clock or negedge Resetn) begin
 		A_i <= 3'd0;
 		A_j <= 3'd0;
 
-
 		DP_address_a <= 7'd0;
 		DP_address_b <= 7'd0;
 		write_data_a <= 32'd0;
 		write_data_b <= 32'd0;
 		write_enable_a <= 1'b0;
 		write_enable_b <= 1'b0;
+
 		DP_address2_a <= 7'd0;
 		DP_address2_b <= 7'd0;
 		write_data2_a <= 32'd0;
@@ -199,51 +199,83 @@ always @(posedge Clock or negedge Resetn) begin
 					row_address <= 17'd0;
 					A_i <= 3'd1;
 					A_j <= 3'd1;
+
+					DP_address_a <= 7'd0;
+					write_data_a <= 32'd0;
+					write_enable_a <= 1'b0;
+
 					M2_state <= S_M2_LI_READ_BLOCK1_1;
 				end
 			end 
-			S_M2_LI_READ_BLOCK1_1:begin
-				 SRAM_address <= block_index + A_i + row_address;
-				 A_i <= A_i + 3'd1;
-				 M2_state <= S_M2_LI_READ_BLOCK1_2
+			S_M2_FS_LI_READ_BLOCK1_1:begin
+				SRAM_address <= block_index + A_i + row_address;
+				A_i <= A_i + 3'd1;
+				M2_state <= S_M2_LI_READ_BLOCK1_2
 			end
-			S_M2_LI_READ_BLOCK1_2:begin
-				 SRAM_address <= block_index + A_i + row_address;
-				 A_i <= A_i + 3'd1;
-				 M2_state <= S_M2_READ_BLOCK_ROW;
+			S_M2_FS_LI_READ_BLOCK1_2:begin
+				SRAM_address <= block_index + A_i + row_address;
+				A_i <= A_i + 3'd1;
+				M2_state <= S_M2_READ_BLOCK_ROW;
+				write_enable_a <= 1'b1;
+ 				write_data_a <= SRAM_read_data;
 			end
-			S_M2_READ_BLOCK_ROW:begin
-				 SRAM_address <= block_index + A_i + row_address;
-				 if (A_i < 3'd6) begin
+			S_M2_FS_READ_BLOCK_ROW:begin
+				SRAM_address <= block_index + A_i + row_address;
+				DP_address_a <= DP_address_a + 1;
+				write_data_a <= SRAM_read_data;
+				if (A_i < 3'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
-				 end else begin
-				 	M2_state <= S_M2_LI_NEXT_ROW;
-				 end
-			end
-			S_M2_NEXT_ROW:begin
-				if (SRAM_address == 17'd230399) begin
- 					M2_state <= S_M2_LO_READ_BLOCK0;
 				end else begin
-					SRAM_address <= block_index + A_i + row_address;
-				 	M2_state <= S_M2_READ_BLOCK_ROW;			 	
+				 	M2_state <= S_M2_LI_NEXT_ROW;
 				end
+			end
+			S_M2_FS_NEXT_ROW:begin
+				DP_address_a <= DP_address_a + 1;
+				write_data_a <= SRAM_read_data;
 				if (A_i == 3'd7) begin
 				 	A_i <= 3'd0;
 				end else begin
 					A_i <= A_i + 3'd1;
 				end
+
 				if (A_j < 3'd7) begin
 				 	A_j <= A_j + 3'd1;
 				 	row_address <= row_address + 17'd320
+					M2_state <= S_M2_FS_READ_BLOCK_ROW; 
+					SRAM_address <= block_index + A_i + row_address;				 	
 				 end else begin
 				 	A_j <= 3'd0;
 					row_address <= 17'd0;
-				 	if(((block_index + 17'd8)%17'd320) == 0)begin
-				 		block_index <= block_index + 17'd2248;
-				 	end else begin
-				 		block_index <= block_index + 17'd8;				 		
-				 	end
+					M2_state <= S_M2_LO_READ_BLOCK1; 
 				 end
+				///////////////// MOVE To COMMON STATE FS/////////////////////////////////
+				// if (SRAM_address == 17'd230399) begin
+ 				//	 	M2_state <= S_M2_LO_READ_BLOCK0;
+				// end else begin
+				// 	SRAM_address <= block_index + A_i + row_address;
+				//  	M2_state <= S_M2_READ_BLOCK_ROW;			 	
+				// end
+				 	// if(((block_index + 17'd8)%17'd320) == 0)begin
+				 	// 	block_index <= block_index + 17'd2248;
+				 	// end else begin
+				 	// 	block_index <= block_index + 17'd8;				 		
+				 	// end
+			 	////////////////////////////////////////////////////////////////////////
+			end
+			S_M2_FS_LO_READ_BLOCK0:begin
+				M2_state <= S_M2_FS_LO_READ_BLOCK0;
+				DP_address_a <= DP_address_a + 1;
+				write_data_a <= SRAM_read_data;
+			end
+			S_M2_FS_LO_READ_BLOCK1:begin
+				M2_state <= S_M2_FS_LO_READ_BLOCK2;
+				DP_address_a <= DP_address_a + 1;
+				write_data_a <= SRAM_read_data;
+			end
+			S_M2_FS_LO_READ_BLOCK2:begin
+				M2_state <= S_M2_IDLE;
+				DP_address_a <= DP_address_a + 1;
+				write_data_a <= SRAM_read_data;
 			end
 			S_M2_CT_LI_init: begin
 				DP_address_a <=  6'd0;
@@ -282,12 +314,7 @@ always @(posedge Clock or negedge Resetn) begin
 			// S_M2_LO_READ_BLOCK0:begin
 			// 	M2_state <= S_M2_LO_READ_BLOCK1;
 			end
-			S_M2_LO_READ_BLOCK1:begin
-				M2_state <= S_M2_LO_READ_BLOCK2;
-			end
-			S_M2_LO_READ_BLOCK2:begin
-				M2_state <= S_M2_IDLE;
-			end
+			
 			default: M2_state <= S_M2_IDLE;
 		endcase
 end
