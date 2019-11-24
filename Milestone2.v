@@ -102,15 +102,16 @@ logic FS_done;
 
 
 //Signals for Calculations
-logic [6:0] read_address_A0, read_address_A1;
-logic [31:0] read_data0_a0;
-logic [31:0] read_data0_a1;
-logic write_enable0_a0;
-logic write_enable0_a1;
+logic [6:0] read_address_A0;
+	// logic [6:0] read_address_A1;
+logic [31:0] read_data_A0;
+	// logic [31:0] read_data_A1;
+logic write_enable_A0;
+	// logic write_enable_A1;
 
 logic [6:0] write_address_B;
-logic [31:0] write_data0_b;
-logic write_enable0_b;
+logic [31:0] write_data_B;
+logic write_enable_B;
 
 logic CS_done;
 logic CT_done;
@@ -165,31 +166,29 @@ assign matrix_A_val_1 = read_data0_b;
 always comb begin
 	if(FS_done == 1'd1) begin
 		DP_address0_a <= read_address_A0;
-		DP_address0_b <= read_address_A1;
+		DP_address0_b <= ;
 		DP_address1_a <= write_address_B;
 		DP_address1_b <= ;// this is for vithu
 
-		read_data0_a0 <= read_data0_a;
-		read_data0_a1 <= read_data0_b;
+		read_data_A0 <= read_data0_a;
+		// read_data_A1 <= read_data0_b;
 
-		write_enable0_a <= write_enable0_a0;
-		write_enable0_b <= write_enable0_a1;
-		write_enable1_a <= write_enable0_b;
+		write_enable0_a <= write_enable_A0;
+		// write_enable0_b <= write_enable_A1;
+		write_enable1_a <= write_enable_B;
 
 	end else begin 
-		write_enable1_b <= ;// this is for vithu
-		DP_address0_a <= write_address_B;
-		DP_address0_b <= ; // this is for vithu
-		DP_address1_a <= read_address_A0;
-		DP_address1_b <= read_address_A1;
+		DP_address0_a <= read_address_A0;
+		DP_address0_b <= ;
+		DP_address1_a <= write_address_B;
+		DP_address1_b <= ;// this is for vithu
 
-		read_data0_a0 <= read_data1_a;
-		read_data0_a1 <= read_data1_b;
+		read_data_A0 <= read_data0_a;
+		// read_data_A1 <= read_data0_b;
 
-		write_enable0_a <= write_enable0_b;
-		write_enable0_b <= ; // this is for vithu
-		write_enable1_a <= write_enable0_a0;
-		write_enable1_b <= write_enable0_a1;
+		write_enable0_a <= write_enable_A0;
+		// write_enable0_b <= write_enable_A1;
+		write_enable1_a <= write_enable_B;
 	end 
 end
 
