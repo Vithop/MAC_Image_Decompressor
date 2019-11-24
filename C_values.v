@@ -11,7 +11,7 @@ Made by Vithuran Sadagopan
 module get_c_values (
 	input logic [2:0] i,
 	input logic [2:0] j,
-	output int C_values,
+	output int C_values
 );
 always_comb begin
 	case(i)
@@ -182,4 +182,4 @@ end
 // 		8'd63:  C_T_values = -399;	
 // 	endcase
 // end	
-// endmodule
+endmodule
