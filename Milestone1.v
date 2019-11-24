@@ -174,7 +174,7 @@ always @(posedge Clock or negedge Resetn) begin
 					UV_count <= 16'd0;
 				end
 			end
-			//****START OF LEAD IN CYCLES
+			//START OF LEAD IN CYCLES
 			S_M1_LI_FIRST_READ_V:begin
 				SRAM_address = intit_U_address + UV_count;
 				UV_count <= UV_count + 16'd1;
@@ -241,7 +241,7 @@ always @(posedge Clock or negedge Resetn) begin
 				U_prime <= (result_a - result_b + result_c + 32'd128) >>> 8;
 				M1_state <= S_M1_CALC_FIRST_RB;
 			end
-			//****START OF REPEATING CYCLES
+			//START OF REPEATING CYCLES
 			S_M1_CALC_FIRST_RB:begin
 				R_even = (R_temp[31] == 1'd1)
 					? 8'd0

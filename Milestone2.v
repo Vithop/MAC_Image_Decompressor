@@ -24,7 +24,8 @@ module Milestone2 (
 
 );
 
-Milestone2_state_type M2_state;
+Milestone2_state_type M2_FWstate;
+Milestone2_state_type M2_Cstate;
 
 //address base values const
 parameter intit_Y_address = 18'd0,
@@ -33,6 +34,7 @@ parameter intit_Y_address = 18'd0,
 		init_PreIDCT_address = 18'd76800,
 		init_T_address = 6'd64,
 		init_S_address = 6'd00;
+
 
 logic [2:0] Ic0, Jc0;
 int matrix_c_val0;
@@ -154,26 +156,6 @@ always comb begin
 		Op2 = ;
 		Op3 = ;
 		Op4 = ;
-	end else if (M2_state == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
-	end else if (M2_state == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
-	end else if (M2_state == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
-	end else if (M2_state == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
 	end else begin
 		Op1 = 31'd0;
 		Op2 = 31'd0;
@@ -184,7 +166,7 @@ end
 
 
 always @(posedge Clock or negedge Resetn) begin
-	if (~Resetn) begin
+	if(~Resetn) begin
 		// reset
 		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
@@ -208,30 +190,8 @@ always @(posedge Clock or negedge Resetn) begin
 		write_enable2_b <= 1'b0;
 
 		M2_state <= S_M2_IDLE;
-	end	else begin
-		case(M2_state)
-			S_M2_IDLE: begin
-				if (Enable == 1'b1) begin
-					SRAM_we_n <= 1'b1;
-					SRAM_write_data <= 16'd0;
-					SRAM_address <= init_PreIDCT_address;
-					block_index <= init_PreIDCT_address;
-					row_address <= 17'd0;
-					A_i <= 4'd1;
-					A_j <= 4'd1;
-
-					YUV_block_address <= 17'd0;
-					YUV_i <= 3'd0;
-					YUV_j <= 3'd0;
-					YUV_row_address <= 17'd0;
-
-					DP_address_a <= 7'd0;
-					write_data_a <= 32'd0;
-					write_enable_a <= 1'b0;
-
-					M2_state <= S_M2_LI_READ_BLOCK1_1;
-				end
-			end 
+	end else begin
+		case(M2_FWstate)
 			S_M2_FS_LI_READ_BLOCK1_1:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
@@ -240,9 +200,9 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_FS_LI_READ_BLOCK1_2:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
-				M2_state <= S_M2_READ_BLOCK_ROW;
 				write_enable_a <= 1'b1;
  				write_data_a <= SRAM_read_data;
+				M2_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_FS_READ_BLOCK_ROW:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
@@ -283,10 +243,121 @@ always @(posedge Clock or negedge Resetn) begin
 				M2_state <= S_M2_IDLE;
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
-				/* MOVE To COMMON STATE FS		 	
-				 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
-			 	*/
+				// MOVE To COMMON STATE FS		 	
+				// 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
+			 	//
 			end
+			// S_M2_LO_READ_BLOCK0:begin
+			// 	M2_state <= S_M2_LO_READ_BLOCK1;
+			S_M2_WS_START_READ:begin
+				DP_address2_a <= 7'd0;
+				DP_address2_b <= DP_address2_a + 7'd1;
+				write_enable2_a <= 1'b0;
+				write_enable2_b <= 1'b0;
+
+				YUV_row_address <= 17'd0;
+			end
+			S_M2_WS_LI_READ_S0:begin
+				DP_address2_a <= DP_address2_a + 7'd2;
+			end
+			S_M2_WS_LI_READ_S1:begin
+				DP_address2_a <= DP_address2_a + 7'd2;
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
+				SRAM_we_n <= 1'd0;
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_i = YUV_i + 3'd1;
+			end
+			S_M2_WS_WRITE_S_ROW:begin
+				DP_address2_a <= DP_address2_a + 7'd2;
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_i = YUV_i + 3'd1;
+				M2_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
+			end
+			S_M2_WS_WRITE_S_NEXT_ROW: begin
+				DP_address2_a <= DP_address2_a + 7'd2;
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_i <= (YUV_i == 3'd3)?3'd0: YUV_i + 3'd1;
+				if (YUV_j < 3'd3) begin
+					YUV_row_address <= YUV_row_address + next_row_postIDCT;
+					YUV_j <= YUV_j + 3'd1;
+					M2_state <= S_M2_WS_WRITE_S_ROW;
+				end else begin
+					M2_state <= S_M2_WS_WRITE_S_LO_0
+				end
+			end
+			S_M2_WS_WRITE_S_LO_0:begin
+				M2_state <= S_M2_WS_WRITE_S_LO_1;
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_i = YUV_i + 3'd1;
+			end
+			S_M2_WS_WRITE_S_LO_1:begin
+				M2_state <= S_M2_WS_WRITE_S_LO_2;
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_i = YUV_i + 3'd1;
+			end 
+			S_M2_WS_END:begin
+				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
+				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
+				YUV_block_address <= (((YUV_block_address+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_address + 17'd4;
+			end
+			default: M2_FWstate <= M2_FW_IDLE;
+		endcase
+	end
+end
+
+always @(posedge Clock or negedge Resetn) begin
+	if (~Resetn) begin
+		// reset
+		SRAM_we_n <= 1'b1;
+		SRAM_write_data <= 16'd0;
+		SRAM_address <= 16'd0;
+		block_index <= init_PreIDCT_address;
+		A_i <= 4'd0;
+		A_j <= 4'd0;
+
+		DP_address_a <= 7'd0;
+		DP_address_b <= 7'd0;
+		write_data_a <= 32'd0;
+		write_data_b <= 32'd0;
+		write_enable_a <= 1'b0;
+		write_enable_b <= 1'b0;
+
+		DP_address2_a <= 7'd0;
+		DP_address2_b <= 7'd0;
+		write_data2_a <= 32'd0;
+		write_data2_b <= 32'd0;
+		write_enable2_a <= 1'b0;
+		write_enable2_b <= 1'b0;
+
+		M2_state <= S_M2_IDLE;
+	end	else begin
+		case(M2_Cstate)
+			S_M2_IDLE: begin
+				if (Enable == 1'b1) begin
+					SRAM_we_n <= 1'b1;
+					SRAM_write_data <= 16'd0;
+					SRAM_address <= init_PreIDCT_address;
+					block_index <= init_PreIDCT_address;
+					row_address <= 17'd0;
+					A_i <= 4'd1;
+					A_j <= 4'd1;
+
+					YUV_block_address <= 17'd0;
+					YUV_i <= 3'd0;
+					YUV_j <= 3'd0;
+					YUV_row_address <= 17'd0;
+
+					DP_address_a <= 7'd0;
+					write_data_a <= 32'd0;
+					write_enable_a <= 1'b0;
+
+					M2_state <= S_M2_LI_READ_BLOCK1_1;
+				end
+			end 
 			S_M2_CT_LI_init: begin
 				write_enable_a <= 1'd0;
 				write_enable_b <= 1'd0;
@@ -355,8 +426,6 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[1] <= matrix_A_val[3];
 				matrix_A_row[0] <= matrix_A_val[2];
 				
-				
-
 				if(B_j < 4'd7 && A_i < 4'd6) begin
 					if(A_i > 4'd0) begin
 						A_i <= A_i + 4'd2;
@@ -388,63 +457,6 @@ always @(posedge Clock or negedge Resetn) begin
 					A_j <= A_j + 3'd1;
 					M2_state <= S_M2_CT_LI_READ_DELAY_1;
 				end
-			end
-			// S_M2_LO_READ_BLOCK0:begin
-			// 	M2_state <= S_M2_LO_READ_BLOCK1;
-			S_M2_WS_START_READ:begin
-				DP_address2_a <= 7'd0;
-				DP_address2_b <= DP_address2_a + 7'd1;
-				write_enable2_a <= 1'b0;
-				write_enable2_b <= 1'b0;
-
-				YUV_row_address <= 17'd0;
-			end
-			S_M2_WS_LI_READ_S0:begin
-				DP_address2_a <= DP_address2_a + 7'd2;
-			end
-			S_M2_WS_LI_READ_S1:begin
-				DP_address2_a <= DP_address2_a + 7'd2;
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
-				SRAM_we_n <= 1'd0;
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i = YUV_i + 3'd1;
-			end
-			S_M2_WS_WRITE_S_ROW:begin
-				DP_address2_a <= DP_address2_a + 7'd2;
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i = YUV_i + 3'd1;
-				M2_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
-			end
-			S_M2_WS_WRITE_S_NEXT_ROW: begin
-				DP_address2_a <= DP_address2_a + 7'd2;
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i <= (YUV_i == 3'd3)?3'd0: YUV_i + 3'd1;
-				if (YUV_j < 3'd3) begin
-					YUV_row_address <= YUV_row_address + next_row_postIDCT;
-					YUV_j <= YUV_j + 3'd1;
-					M2_state <= S_M2_WS_WRITE_S_ROW;
-				end else begin
-					M2_state <= S_M2_WS_WRITE_S_LO_0
-				end
-			end
-			S_M2_WS_WRITE_S_LO_0:begin
-				M2_state <= S_M2_WS_WRITE_S_LO_1;
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i = YUV_i + 3'd1;
-			end
-			S_M2_WS_WRITE_S_LO_1:begin
-				M2_state <= S_M2_WS_WRITE_S_LO_2;
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i = YUV_i + 3'd1;
-			end 
-			S_M2_WS_END:begin
-				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
-				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_block_address <= (((YUV_block_address+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_address + 17'd4;
 			end
 			default: M2_state <= S_M2_IDLE;
 		endcase

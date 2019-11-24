@@ -84,8 +84,18 @@ typedef enum logic [3:0]{
 	S_M2_,
 	S_M2_,
 	S_M2_,
-	S_M2_
-} Milestone2_state_type;
+	S_M2
+} Milestone2_FWstate_type;
+
+typedef enum logic [3:0]{
+	S_M2_IDLE,
+	S_M2_LI_READ_BLOCK,
+	S_M2_CALC_T,
+	S_M2_,
+	S_M2_,
+	S_M2_,
+	S_M2	
+} Milestone2_Cstate_type;
 
 
 `define DEFINE_STATE 1
