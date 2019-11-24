@@ -24,7 +24,8 @@ module Milestone2 (
 
 );
 
-Milestone2_state_type M2_FWstate;
+Milestone2_state_type M2_FS_state;
+Milestone2_state_type M2_WS_state;
 Milestone2_state_type M2_C_state;
 
 //address base values const
@@ -161,7 +162,7 @@ assign matrix_A_val_0 = read_data_a;
 assign matrix_A_val_1 = read_data_b;
 
 
-always comb beginew
+always comb begin
 	if(FS_done == 1'd1) begin
 		DP_address_a <= read_address_A0;
 		DP_address_b <= read_address_A1;
@@ -174,8 +175,9 @@ always comb beginew
 		write_enable_a <= write_enable_A0;
 		write_enable_b <= write_enable_A1;
 		write_enable2_a <= write_enable_B;
+
+	end else begin 
 		write_enable2_b <= ;// this is for vithu
-	end else if(CT_done == 1'd1) begin 
 		DP_address_a <= write_address_B;
 		DP_address_b <= ; // this is for vithu
 		DP_address2_a <= read_address_A0;
@@ -188,33 +190,7 @@ always comb beginew
 		write_enable_b <= ; // this is for vithu
 		write_enable2_a <= write_enable_A0;
 		write_enable2_b <= write_enable_A1;
-	end else if(CS_done == 1'd1) begin
-		DP_address_a <= read_address_A0;
-		DP_address_b <= read_address_A1;
-		DP_address2_a <= write_address_B;
-		DP_address2_b <= ;// this is for vithu
-
-		read_data_A0 <= read_data_a;
-		read_data_A1 <= read_data_b;
-
-		write_enable_a <= write_enable_A0;
-		write_enable_b <= write_enable_A1;
-		write_enable2_a <= write_enable_B;
-		write_enable2_b <= ;// this is for vithu
-	end else begin
-		DP_address_a <= read_address_A;
-		DP_address_b <= read_address_A1;
-		DP_address2_a <= write_address_B;
-		DP_address2_b <= ;// this is for vithu
-
-		read_data_A0 <= read_data_a;
-		read_data_A1 <= read_data_b;
-
-		write_enable_a <= write_enable_A0;
-		write_enable_b <= write_enable_A1;
-		write_enable2_a <= write_enable_B;
-		write_enable2_b <= ;// this is for vithu
-	end
+	end 
 end
 
 always comb begin
@@ -245,7 +221,7 @@ always @(posedge Clock or negedge Resetn) begin
 		DP_address_a <= 7'd0;
 		write_data_a <= 32'd0;
 		write_enable_a <= 1'b0;
-
+		FS_done <= 1'b0;
 		M2_FS_state <= S_M2_IDLE;
 	end else begin
 		case(M2_FS_state)
@@ -253,10 +229,11 @@ always @(posedge Clock or negedge Resetn) begin
 				if (Enable == 1'b1) begin
 					preIDCT_i <= 4'd0;
 					preIDCT_j <= 4'd0;
+					write_enable_a <= 1'd0;
+					DP_address_a <=  6'd0;
+					FS_done <= 1'b0;
 					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
 				end 
-				write_enable_a <= 1'd0;
-				DP_address_a <=  6'd0;
 				
 			end
 			S_M2_FS_LI_READ_BLOCK_1:begin
@@ -311,12 +288,23 @@ always @(posedge Clock or negedge Resetn) begin
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
 				block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
+				FS_done <= 1'b1;
 			end
 			S_M2_FS_WAIT:begin
-				
-				M2_state <= S_M2_IDLE;
+				if (SRAM_address == 18'd230399) begin
+					M2_FS_state <= S_M2_FS_IDLE;
+				end else if (CT_done) begin
+					preIDCT_i <= 4'd0;
+					preIDCT_j <= 4'd0;
+					write_enable_a <= 1'd0;
+					DP_address_a <=  6'd0;
+					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
+					FS_done <= 1'b0;
+				end else begin
+					M2_FS_state <= S_M2_FS_WAIT;
+				end
 			end
-			default: M2_FWstate <= S_M2_FS_IDLE;
+			default: M2_FS_state <= S_M2_FS_IDLE;
 		endcase
 	end
 end
@@ -327,28 +315,20 @@ always @(posedge Clock or negedge Resetn) begin
 		SRAM_we_n <= 1'b1;
 		SRAM_write_data <= 16'd0;
 		SRAM_address <= 16'd0;
-		block_index <= init_PreIDCT_address;
-		A_i <= 4'd0;
-		A_j <= 4'd0;
-
-		DP_address_a <= 7'd0;
-		DP_address_b <= 7'd0;
-		write_data_a <= 32'd0;
-		write_data_b <= 32'd0;
-		write_enable_a <= 1'b0;
-		write_enable_b <= 1'b0;
 
 		DP_address2_a <= 7'd0;
-		DP_address2_b <= 7'd0;
-		write_data2_a <= 32'd0;
-		write_data2_b <= 32'd0;
+		DP_address2_b <= DP_address2_a + 7'd1;
 		write_enable2_a <= 1'b0;
 		write_enable2_b <= 1'b0;
 
-		M2_state <= S_M2_IDLE;
+		YUV_row_address <= 17'd0;
+
+		M2_WS_state <= S_M2_WS_WAIT;
 	end else begin
 		case(M2_WS_state)
-			
+			S_M2_WS_WAIT:begin
+				M2_WS_state <= (CS_done)? S_M2_WS_START_READ: S_M2_WS_WAIT;
+			end
 			S_M2_WS_START_READ:begin
 				DP_address2_a <= 7'd0;
 				DP_address2_b <= DP_address2_a + 7'd1;
@@ -403,8 +383,9 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
 				YUV_block_address <= (((YUV_block_address+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_address + 17'd4;
+				M2_WS_state <= M2_WS_WAIT;
 			end
-			default: M2_FWstate <= M2_FW_IDLE;
+			default: M2_WS_state <= M2_WS_WAIT;
 		endcase
 	end
 end
