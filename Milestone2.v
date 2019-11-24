@@ -98,7 +98,7 @@ logic [3:0] preIDCT_i;
 logic [3:0] preIDCT_j;
 logic [17:0] block_index;
 logic [17:0] row_address;
-logic FS_end;
+logic FS_done;
 
 
 //Signals for Calculations
@@ -167,6 +167,7 @@ always comb begin
 		DP_address_a <= read_address_A0;
 		DP_address_b <= read_address_A1;
 		DP_address2_a <= write_address_B;
+		DP_address2_b <= ;// this is for vithu
 
 		read_data_A0 <= read_data_a;
 		read_data_A1 <= read_data_b;
@@ -174,14 +175,22 @@ always comb begin
 		write_enable_a <= write_enable_A0;
 		write_enable_b <= write_enable_A1;
 		write_enable2_a <= write_enable_B;
+
 	end else begin 
+		write_enable2_b <= ;// this is for vithu
 		DP_address_a <= write_address_B;
+		DP_address_b <= ; // this is for vithu
 		DP_address2_a <= read_address_A0;
 		DP_address2_b <= read_address_A1;
 
 		read_data_A0 <= read_data2_a;
 		read_data_A1 <= read_data2_b;
-	end else if()
+
+		write_enable_a <= write_enable_B;
+		write_enable_b <= ; // this is for vithu
+		write_enable2_a <= write_enable_A0;
+		write_enable2_b <= write_enable_A1;
+	end 
 end
 
 always comb begin
