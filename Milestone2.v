@@ -91,11 +91,15 @@ dual_port_RAM1 dual_port_RAM_inst1 (
 
 logic [17:0] next_row_preIDCT;
 logic [17:0] next_row_postIDCT;
-logic [3:0] A_i;
-logic [3:0] A_j;
+logic [3:0] preIDCT_i;
+logic [3:0] preIDCT_j;
 logic [17:0] block_index;
 logic [17:0] row_address;
+
+
 // General Matrix A that will represent S' or T
+logic [3:0] A_i;
+logic [3:0] A_j;
 logic [15:0] matrix_A_row [7:0];
 logic [7:0] matrix_A_val_0;
 logic [7:0] matrix_A_val_1;
@@ -228,22 +232,22 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end 
 			S_M2_FS_LI_READ_BLOCK1_1:begin
-				SRAM_address <= block_index + A_i + row_address;
-				A_i <= A_i + 4'd1;
+				SRAM_address <= block_index + preIDCT_i + row_address;
+				preIDCT_i <= preIDCT_i + 4'd1;
 				M2_state <= S_M2_LI_READ_BLOCK1_2
 			end
 			S_M2_FS_LI_READ_BLOCK1_2:begin
-				SRAM_address <= block_index + A_i + row_address;
-				A_i <= A_i + 4'd1;
+				SRAM_address <= block_index + preIDCT_i + row_address;
+				preIDCT_i <= preIDCT_i + 4'd1;
 				M2_state <= S_M2_READ_BLOCK_ROW;
 				write_enable_a <= 1'b1;
  				write_data_a <= SRAM_read_data;
 			end
 			S_M2_FS_READ_BLOCK_ROW:begin
-				SRAM_address <= block_index + A_i + row_address;
+				SRAM_address <= block_index + preIDCT_i + row_address;
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
-				if (A_i < 4'd6) begin
+				if (preIDCT_i < 4'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				end else begin
 				 	M2_state <= S_M2_LI_NEXT_ROW;
@@ -252,19 +256,19 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_FS_NEXT_ROW:begin
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
-				if (A_i == 4'd7) begin
-				 	A_i <= 4'd0;
+				if (preIDCT_i == 4'd7) begin
+				 	preIDCT_i <= 4'd0;
 				end else begin
-					A_i <= A_i + 4'd1;
+					preIDCT_i <= preIDCT_i + 4'd1;
 				end
 
-				if (A_j < 4'd7) begin
-				 	A_j <= A_j + 4'd1;
+				if (preIDCT_j < 4'd7) begin
+				 	preIDCT_j <= preIDCT_j + 4'd1;
 				 	row_address <= row_address + next_row_preIDCT
 					M2_state <= S_M2_FS_READ_BLOCK_ROW; 
-					SRAM_address <= block_index + A_i + row_address;				 	
+					SRAM_address <= block_index + preIDCT_i + row_address;				 	
 				 end else begin
-				 	A_j <= 4'd0;
+				 	preIDCT_j <= 4'd0;
 					row_address <= 17'd0;
 					M2_state <= S_M2_LO_READ_BLOCK1; 
 				 end
