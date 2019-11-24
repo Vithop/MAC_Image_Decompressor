@@ -100,7 +100,18 @@ logic [17:0] row_address;
 
 
 //Signals for Calculations
+logic [6:0] read_address_A0, read_address_A1;
+logic [31:0] read_data_A0;
+logic [31:0] read_data_A1;
+logic write_enable_A0;
+logic write_enable_A1;
 
+logic [6:0] write_address_B;
+logic [31:0] write_data_B;
+logic write_enable_B;
+
+logic end_CS;
+logic end_CT;
 
 // General Matrix A that will represent S' or T
 logic [3:0] A_i;
@@ -148,6 +159,24 @@ assign result_b = {temp_b[31:0]};
 assign matrix_A_val_0 = read_data_a;
 assign matrix_A_val_1 = read_data_b;
 
+always comb beginew
+	if(end_FS == 1'd1) begin
+		DP_address_a <= read_address_A0;
+		DP_address_b <= read_address_A1;
+		DP_address2_a <= write_address_B;
+
+		read_data_A0 <= read_data_a;
+		read_data_A1 <= read_data_b;
+	end else if(end_CT == 1'd1) begin 
+		DP_address2_a <= read_address_A0;
+		DP_address2_b <= read_address_A1;
+		DP_address_a <= write_address_B;
+
+		read_data_A0 <= read_data2_a;
+		read_data_A1 <= read_data2_b;
+	end else if()
+end
+
 always comb begin
 	if(M2_state == S_M2_CT_LI_read || S_M2_CT_LI_CALC_B_ROW)begin
 		Op1 = matrix_A_row[7];
@@ -194,13 +223,23 @@ always @(posedge Clock or negedge Resetn) begin
 
 		M2_state <= S_M2_IDLE;
 	end else begin
-		case(M2_FWstate)
-			S_M2_FS_LI_READ_BLOCK1_1:begin
+		case(M2_FS_state)
+			S_M2_FS_IDLE:begin
+				if (Enable == 1'b1) begin
+					preIDCT_i <= 4'd0;
+					preIDCT_j <= 4'd0;
+					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
+				end 
+				write_enable_a <= 1'd0;
+				DP_address_a <=  6'd0;
+				
+			end
+			S_M2_FS_LI_READ_BLOCK_1:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
-				M2_state <= S_M2_LI_READ_BLOCK1_2
+				M2_state <= S_M2_LI_READ_BLOCK_2
 			end
-			S_M2_FS_LI_READ_BLOCK1_2:begin
+			S_M2_FS_LI_READ_BLOCK_2:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
 				write_enable_a <= 1'b1;
@@ -250,8 +289,39 @@ always @(posedge Clock or negedge Resetn) begin
 				// 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
 			 	//
 			end
-			// S_M2_LO_READ_BLOCK0:begin
-			// 	M2_state <= S_M2_LO_READ_BLOCK1;
+			default: M2_FWstate <= S_M2_FS_IDLE;
+		endcase
+	end
+end
+
+always @(posedge Clock or negedge Resetn) begin
+	if(~Resetn) begin
+		// reset
+		SRAM_we_n <= 1'b1;
+		SRAM_write_data <= 16'd0;
+		SRAM_address <= 16'd0;
+		block_index <= init_PreIDCT_address;
+		A_i <= 4'd0;
+		A_j <= 4'd0;
+
+		DP_address_a <= 7'd0;
+		DP_address_b <= 7'd0;
+		write_data_a <= 32'd0;
+		write_data_b <= 32'd0;
+		write_enable_a <= 1'b0;
+		write_enable_b <= 1'b0;
+
+		DP_address2_a <= 7'd0;
+		DP_address2_b <= 7'd0;
+		write_data2_a <= 32'd0;
+		write_data2_b <= 32'd0;
+		write_enable2_a <= 1'b0;
+		write_enable2_b <= 1'b0;
+
+		M2_state <= S_M2_IDLE;
+	end else begin
+		case(M2_WS_state)
+			
 			S_M2_WS_START_READ:begin
 				DP_address2_a <= 7'd0;
 				DP_address2_b <= DP_address2_a + 7'd1;
@@ -339,11 +409,6 @@ always @(posedge Clock or negedge Resetn) begin
 		M2_state <= S_M2_IDLE;
 	end	else begin
 		case(M2_C_state)
-			S_M2_IDLE: begin
-				if (Enable == 1'b1) begin
-					
-				end
-			end 
 			S_M2_CT_LI_init: begin
 				write_enable_a <= 1'd0;
 				write_enable_b <= 1'd0;
