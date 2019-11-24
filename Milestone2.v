@@ -226,7 +226,7 @@ always @(posedge Clock or negedge Resetn) begin
 		A_j <= 4'd0;
 
 		FS_DP_address <= 7'd0;
-		write_data0_a <= 32'd0;
+		write_data0_b <= 32'd0;
 		FS_DP_write_enable <= 1'b0;
 		FS_done <= 1'b0;
 		M2_FS_state <= S_M2_IDLE;
@@ -252,13 +252,13 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
 				FS_DP_write_enable <= 1'b1;
- 				write_data0_a <= SRAM_read_data;
+ 				write_data0_b <= SRAM_read_data;
 				M2_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_FS_READ_BLOCK_ROW:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				FS_DP_address <= FS_DP_address + 1;
-				write_data0_a <= SRAM_read_data;
+				write_data0_b <= SRAM_read_data;
 				if (preIDCT_i < 4'd6) begin
 				 	M2_state <= S_M2_READ_BLOCK_ROW;
 				end else begin
@@ -267,7 +267,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_FS_NEXT_ROW:begin
 				FS_DP_address <= FS_DP_address + 1;
-				write_data0_a <= SRAM_read_data;
+				write_data0_b <= SRAM_read_data;
 				preIDCT_i <= (preIDCT_i == 4'd7)? 4'd0: preIDCT_i + 4'd1;
 				if (preIDCT_j < 4'd7) begin
 				 	preIDCT_j <= preIDCT_j + 4'd1;
@@ -282,17 +282,18 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_FS_LO_READ_BLOCK0:begin
 				M2_state <= S_M2_FS_LO_READ_BLOCK0;
-				FS_DP_address <= DP_addrFS_ess0_a + 1			write_data0_a <= FS_SRAM_read_a;
+				FS_DP_address <= FS_DP_address + 1;
+				write_data0_b <= FS_SRAM_read_a;
 			end
 			S_M2_FS_LO_READ_BLOCK1:begin
 				M2_state <= S_M2_FS_LO_READ_BLOCK2;
 				FS_DP_address <= FS_DP_address + 1;
-				write_data0_a <= SRAM_read_data;
+				write_data0_b <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK2:begin
 				M2_state <= S_M2_FS_WAIT;
 				FS_DP_address <= FS_DP_address + 1;
-				write_data0_a <= SRAM_read_data;
+				write_data0_b <= SRAM_read_data;
 				block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
 				FS_done <= 1'b1;
 			end
