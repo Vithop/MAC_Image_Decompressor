@@ -166,7 +166,7 @@ always comb beginew
 		DP_address_a <= read_address_A0;
 		DP_address_b <= read_address_A1;
 		DP_address2_a <= write_address_B;
-		DP_address2_b <= ;// this 
+		DP_address2_b <= ;// this is for vithu
 
 		read_data_A0 <= read_data_a;
 		read_data_A1 <= read_data_b;
@@ -174,10 +174,10 @@ always comb beginew
 		write_enable_a <= write_enable_A0;
 		write_enable_b <= write_enable_A1;
 		write_enable2_a <= write_enable_B;
-		write_enable2_b <= ;
+		write_enable2_b <= ;// this is for vithu
 	end else if(CT_done == 1'd1) begin 
 		DP_address_a <= write_address_B;
-		DP_address_b <= ;
+		DP_address_b <= ; // this is for vithu
 		DP_address2_a <= read_address_A0;
 		DP_address2_b <= read_address_A1;
 
@@ -188,7 +188,33 @@ always comb beginew
 		write_enable_b <= ; // this is for vithu
 		write_enable2_a <= write_enable_A0;
 		write_enable2_b <= write_enable_A1;
-	end else if()
+	end else if(CS_done == 1'd1) begin
+		DP_address_a <= read_address_A0;
+		DP_address_b <= read_address_A1;
+		DP_address2_a <= write_address_B;
+		DP_address2_b <= ;// this is for vithu
+
+		read_data_A0 <= read_data_a;
+		read_data_A1 <= read_data_b;
+
+		write_enable_a <= write_enable_A0;
+		write_enable_b <= write_enable_A1;
+		write_enable2_a <= write_enable_B;
+		write_enable2_b <= ;// this is for vithu
+	end else begin
+		DP_address_a <= read_address_A;
+		DP_address_b <= read_address_A1;
+		DP_address2_a <= write_address_B;
+		DP_address2_b <= ;// this is for vithu
+
+		read_data_A0 <= read_data_a;
+		read_data_A1 <= read_data_b;
+
+		write_enable_a <= write_enable_A0;
+		write_enable_b <= write_enable_A1;
+		write_enable2_a <= write_enable_B;
+		write_enable2_b <= ;// this is for vithu
+	end
 end
 
 always comb begin
