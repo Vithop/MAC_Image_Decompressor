@@ -473,12 +473,12 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[2] <= matrix_A_val[4];
 				matrix_A_row[1] <= matrix_A_val[3];
 				matrix_A_row[0] <= matrix_A_val[2];
+				CTCS_B_w_en <= 1'd0;
 
 				// starting B_j 5 buffering the values for the next row calculations
 				if((B_j == 4'd5 && A_i > 4'd0) || (B_j == 4'd6) || (B_j == 4'd7 && A_i < 4'd2)) begin
 					CTCS_A0_read_address <= CTCS_A0_read_address + 6'd1;
 				end
-
 				if(B_j > 4'd5) begin
 					nxt_matrix_A_row[7] <= CTCS_A0_read_data;
 					nxt_matrix_A_row[6] <= nxt_matrix_A_row[7]
@@ -489,7 +489,6 @@ always @(posedge Clock or negedge Resetn) begin
 					nxt_matrix_A_row[1] <= nxt_matrix_A_row[2]
 					nxt_matrix_A_row[0] <= nxt_matrix_A_row[1]
 				end
-				
 				if(A_i < 4'd6) begin
 					A_i <= A_i + 4'd2;
 					Jc0 <= Jc0 + 3'd2;
@@ -498,13 +497,18 @@ always @(posedge Clock or negedge Resetn) begin
 					M2_CTCS_state <= S_M2_CTCS_CALC_B_ROW;
 				end else begin
 					A_i <= 4'd0;
-					B_j <= B_j + 4'd1
-					Ic0 <= Ic0 + 3'd1;
 					Jc0 <= 3'd0;
-					Ic1 <= Ic1 + 3'd0;
 					Jc1 <= 3'd1;
 					temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
-					M2_CTCS_state <= S_M2_CTCS_CALC_B_NEXT_ROW
+					M2_CTCS_state <= S_M2_CTCS_CALC_B_NEXT_ROW;
+
+					if(B_j == 4'd7) begin
+						Ic0 <= 3'd0;
+						Ic1 <= 3'd0;
+					end else begin
+						Ic0 <= Ic0 + 3'd1;
+						Ic1 <= Ic1 + 3'd0;
+					end
 				end
 
 			end
@@ -518,8 +522,15 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[1] <= matrix_A_val[3];
 				matrix_A_row[0] <= matrix_A_val[2];
 
+				if(B_j == 4'd7) begin
+					B_i <= B_i + 4'd1;
+					B_j <= 4'd0;
+				end else begin
+					B_j <= B_j + 4'd1
+				end
+
 				CTCS_B_w_en <= 1'd1;
-				CTCS_B_write_address <= 
+				CTCS_B_write_address <= CTCS_B_write_address + 7'd8 + B_i;
 				CTCS_B_write_data <= temp_B_val_0;
 				
 				A_i <= A_i + 4'd2;
