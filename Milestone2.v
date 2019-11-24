@@ -97,6 +97,7 @@ logic [3:0] preIDCT_i;
 logic [3:0] preIDCT_j;
 logic [17:0] block_index;
 logic [17:0] row_address;
+logic FS_end;
 
 
 //Signals for Calculations
@@ -110,8 +111,8 @@ logic [6:0] write_address_B;
 logic [31:0] write_data_B;
 logic write_enable_B;
 
-logic end_CS;
-logic end_CT;
+logic CS_done;
+logic CT_done;
 
 // General Matrix A that will represent S' or T
 logic [3:0] A_i;
@@ -160,14 +161,18 @@ assign matrix_A_val_0 = read_data_a;
 assign matrix_A_val_1 = read_data_b;
 
 always comb beginew
-	if(end_FS == 1'd1) begin
+	if(FS_done == 1'd1) begin
 		DP_address_a <= read_address_A0;
 		DP_address_b <= read_address_A1;
 		DP_address2_a <= write_address_B;
 
 		read_data_A0 <= read_data_a;
 		read_data_A1 <= read_data_b;
-	end else if(end_CT == 1'd1) begin 
+
+		write_enable_a <= write_enable_A0;
+		write_enable_b <= write_enable_A1;
+		write_enable2_a <= write_enable_B;
+	end else if(CT_done == 1'd1) begin 
 		DP_address2_a <= read_address_A0;
 		DP_address2_b <= read_address_A1;
 		DP_address_a <= write_address_B;
