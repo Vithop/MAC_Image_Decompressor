@@ -228,13 +228,23 @@ always @(posedge Clock or negedge Resetn) begin
 
 		M2_state <= S_M2_IDLE;
 	end else begin
-		case(M2_FWstate)
-			S_M2_FS_LI_READ_BLOCK1_1:begin
+		case(M2_FS_state)
+			S_M2_FS_IDLE:begin
+				if (Enable == 1'b1) begin
+					preIDCT_i <= 4'd0;
+					preIDCT_j <= 4'd0;
+					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
+				end 
+				write_enable_a <= 1'd0;
+				DP_address_a <=  6'd0;
+				
+			end
+			S_M2_FS_LI_READ_BLOCK_1:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
-				M2_state <= S_M2_LI_READ_BLOCK1_2
+				M2_state <= S_M2_LI_READ_BLOCK_2
 			end
-			S_M2_FS_LI_READ_BLOCK1_2:begin
+			S_M2_FS_LI_READ_BLOCK_2:begin
 				SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
 				write_enable_a <= 1'b1;
@@ -284,8 +294,39 @@ always @(posedge Clock or negedge Resetn) begin
 				// 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
 			 	//
 			end
-			// S_M2_LO_READ_BLOCK0:begin
-			// 	M2_state <= S_M2_LO_READ_BLOCK1;
+			default: M2_FWstate <= S_M2_FS_IDLE;
+		endcase
+	end
+end
+
+always @(posedge Clock or negedge Resetn) begin
+	if(~Resetn) begin
+		// reset
+		SRAM_we_n <= 1'b1;
+		SRAM_write_data <= 16'd0;
+		SRAM_address <= 16'd0;
+		block_index <= init_PreIDCT_address;
+		A_i <= 4'd0;
+		A_j <= 4'd0;
+
+		DP_address_a <= 7'd0;
+		DP_address_b <= 7'd0;
+		write_data_a <= 32'd0;
+		write_data_b <= 32'd0;
+		write_enable_a <= 1'b0;
+		write_enable_b <= 1'b0;
+
+		DP_address2_a <= 7'd0;
+		DP_address2_b <= 7'd0;
+		write_data2_a <= 32'd0;
+		write_data2_b <= 32'd0;
+		write_enable2_a <= 1'b0;
+		write_enable2_b <= 1'b0;
+
+		M2_state <= S_M2_IDLE;
+	end else begin
+		case(M2_WS_state)
+			
 			S_M2_WS_START_READ:begin
 				DP_address2_a <= 7'd0;
 				DP_address2_b <= DP_address2_a + 7'd1;
@@ -373,11 +414,6 @@ always @(posedge Clock or negedge Resetn) begin
 		M2_state <= S_M2_IDLE;
 	end	else begin
 		case(M2_C_state)
-			S_M2_IDLE: begin
-				if (Enable == 1'b1) begin
-					
-				end
-			end 
 			S_M2_CT_LI_init: begin
 				write_enable_a <= 1'd0;
 				write_enable_b <= 1'd0;
