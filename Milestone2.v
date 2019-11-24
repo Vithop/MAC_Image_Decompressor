@@ -25,7 +25,7 @@ module Milestone2 (
 );
 
 Milestone2_state_type M2_FWstate;
-Milestone2_state_type M2_Cstate;
+Milestone2_state_type M2_C_state;
 
 //address base values const
 parameter intit_Y_address = 18'd0,
@@ -97,6 +97,9 @@ logic [3:0] preIDCT_i;
 logic [3:0] preIDCT_j;
 logic [17:0] block_index;
 logic [17:0] row_address;
+
+
+//Signals for Calculations
 
 
 // General Matrix A that will represent S' or T
@@ -335,27 +338,10 @@ always @(posedge Clock or negedge Resetn) begin
 
 		M2_state <= S_M2_IDLE;
 	end	else begin
-		case(M2_Cstate)
+		case(M2_C_state)
 			S_M2_IDLE: begin
 				if (Enable == 1'b1) begin
-					SRAM_we_n <= 1'b1;
-					SRAM_write_data <= 16'd0;
-					SRAM_address <= init_PreIDCT_address;
-					block_index <= init_PreIDCT_address;
-					row_address <= 17'd0;
-					A_i <= 4'd1;
-					A_j <= 4'd1;
-
-					YUV_block_address <= 17'd0;
-					YUV_i <= 3'd0;
-					YUV_j <= 3'd0;
-					YUV_row_address <= 17'd0;
-
-					DP_address_a <= 7'd0;
-					write_data_a <= 32'd0;
-					write_enable_a <= 1'b0;
-
-					M2_state <= S_M2_LI_READ_BLOCK1_1;
+					
 				end
 			end 
 			S_M2_CT_LI_init: begin
