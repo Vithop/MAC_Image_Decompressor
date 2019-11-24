@@ -83,10 +83,15 @@ logic [25:0] UART_timer;
 //For Milestone1 SRAM interface
 logic M1_enable;
 logic [17:0] M1_SRAM_address;
-logic [15:0] M1_SRAM_read_data;
 logic [15:0] M1_SRAM_write_data;
 logic M1_SRAM_we_n;
-logic [3:0] M1_SRAM_state;
+
+
+// For Milestone2 SRAM interface
+logic M2_enable;
+logic [17:0] M2_SRAM_address;
+logic [15:0] M2_SRAM_write_data;
+logic M2_SRAM_we_n;
 
 logic [6:0] value_7_segment [7:0];
 
@@ -177,9 +182,19 @@ Milestone1 M1_unit(
 	.Resetn(~SWITCH_I[17]),
 	.Enable(M1_enable),
 	.SRAM_address(M1_SRAM_address),
-	.SRAM_read_data(M1_SRAM_read_data),
+	.SRAM_read_data(SRAM_read_data),
 	.SRAM_write_data(M1_SRAM_write_data),
 	.SRAM_we_n(M1_SRAM_we_n)
+);
+
+Milestone2 M2_unit(
+	.Clock(CLOCK_50_I),
+	.Resetn(~SWITCH_I[17]),
+	.Enable(M2_enable),
+	.SRAM_address(M2_SRAM_address),
+	.SRAM_read_data(SRAM_read_data),
+	.SRAM_write_data(M2_SRAM_write_data),
+	.SRAM_we_n(M2_SRAM_we_n)
 );
 
 always @(posedge CLOCK_50_I or negedge resetn) begin
@@ -230,6 +245,16 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 				UART_rx_initialize <= 1'b1;
 				 				
 				VGA_enable <= 1'b1;
+				top_state <= S_ENABLE_M2;
+			end
+		end
+		S_ENABLE_M2:begin
+			M2_enable <= 1'b1;
+			top_state <= S_WAIT_M2;
+		end
+		S_WAIT_M2:begin
+			if ((SRAM_address == 18'd76799) && (SRAM_we_n ==  1'b0)) begin
+				M2_enable <= 1'b0;
 				top_state <= S_ENABLE_M1;
 			end
 		end
@@ -244,8 +269,6 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 				top_state <= S_IDLE;
 			end
 		end
-		S_WAIT_M2: begin
-		end
 		default: top_state <= S_IDLE;
 		endcase
 	end
@@ -256,15 +279,19 @@ assign VGA_base_address = 18'd146944;
 // Give access to SRAM for UART and VGA at appropriate time
 assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_address 
-						: (top_state == S_WAIT_M1) ? M1_SRAM_address : VGA_SRAM_address;
+						: (top_state == S_WAIT_M1) ? M1_SRAM_address 
+						: (top_state == S_WAIT_M2) ? M2_SRAM_address 
+						: VGA_SRAM_address;
 
-assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data : UART_SRAM_write_data;
+assign SRAM_write_data = (top_state == S_WAIT_M1) ? M1_SRAM_write_data 
+							: (top_state == S_WAIT_M2) ? M2_SRAM_write_data 
+							: UART_SRAM_write_data;
 
 assign SRAM_we_n = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
 						? UART_SRAM_we_n 
-						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n : 1'b1;
+						: (top_state == S_WAIT_M1) ? M1_SRAM_we_n 
+						: (top_state == S_WAIT_M2) ? M2_SRAM_we_n : 1'b1;
 
-assign M1_SRAM_read_data = SRAM_read_data;
 
 // 7 segment displays
 convert_hex_to_seven_segment unit7 (

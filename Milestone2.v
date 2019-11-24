@@ -347,7 +347,6 @@ always @(posedge Clock or negedge Resetn) begin
 				WS_DP_write_enable <= 1'b0;
 				YUV_buff <= 8'd0;
 				YUV_row_address <= 17'd0;
-				SRAM_we_n <= 1'd0;
 				M2_WS_state <= S_M2_WS_LI_READ_S0;
 			end
 			S_M2_WS_LI_READ_S0:begin
