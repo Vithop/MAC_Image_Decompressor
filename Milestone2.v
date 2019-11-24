@@ -99,6 +99,7 @@ logic [17:0] row_address;
 logic [15:0] matrix_A_row [7:0];
 logic [7:0] matrix_A_val_0;
 logic [7:0] matrix_A_val_1;
+logic [6:0] last_read_address;
 // logic [7:0] matrix_A_val_2;
 
 // B will be the result matrix
@@ -348,6 +349,7 @@ always @(posedge Clock or negedge Resetn) begin
 					matrix_A_row[7] <= matrix_A_val[1];
 					matrix_A_row[6] <= matrix_A_val[0];
 					DP_address_a <= init_T_address;
+					last_read_address <= DP_address_a
 					A_i <= 3'd0;
 					M2_state <= S_M2_CT_LI_CALC_B_ROW;
 				end
@@ -366,15 +368,20 @@ always @(posedge Clock or negedge Resetn) begin
 				
 				
 
-				if(B_j < 4'd7) begin
+				if(B_j < 4'd7 && A_i < 4'd6) begin
 					if(A_i > 4'd0) begin
-						A_i <= A_i + 3'd2;
+						A_i <= A_i + 4'd2;
 						temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
 						write_enable_a <= 1'b0;
 					end else begin
-						write_enable_a <= 1'b1;
-						DP_address_a <= B_j == 4'd0 ? DP_address_a : DP_address_a + 6'd8 + B_i;;
-						write_data_a <= temp_B_val_0;
+						if(B_j == 4'd7 && A_i > 4'd2) begin
+							DP_address_a <= DP_address_a + 6'd2;
+							DP_address_b <= DP_address_b + 6'd2;
+						end
+					// Use Second DPRAM for writing calculation results to
+						write_enable2_a <= 1'b1;
+						DP_address2_a <= B_j == 4'd0 ? DP_address_a : DP_address_a + 6'd8 + B_i;;
+						write_data2_a <= temp_B_val_0;
 						temp_B_val_0 <= result_a + result_b;
 						// B_i <= 3'd0;
 						B_j <= B_j + 4'd1;
@@ -385,7 +392,9 @@ always @(posedge Clock or negedge Resetn) begin
 					end
 					M2_state <= S_M2_CT_LI_CALC_B_ROW;
 				end else begin
-					DP_address_a <= DP_address_a + 6'd8 + B_i;
+					write_enable_a <= 1'b0;
+					DP_address_a <= last_read_address + 6'd2;
+					DP_address_b <= last_read_address + 6'd2;
 					B_i <= B_i + 3'd1;
 					A_j <= A_j + 3'd1;
 					M2_state <= S_M2_CT_LI_READ_DELAY_1;
