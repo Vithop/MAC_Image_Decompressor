@@ -104,16 +104,16 @@ logic FS_done;
 
 
 //Signals for Calculations
-logic [6:0] read_address_A0;
+logic [6:0] CSCT_A0_read_address;
 	// logic [6:0] read_address_A1;
-logic [31:0] read_data_A0;
+logic [31:0] CSCT_A0_read_data;
 	// logic [31:0] read_data_A1;
-logic write_enable_A0;
+logic CSCT_A0_w_en;
 	// logic write_enable_A1;
 
-logic [6:0] write_address_B;
-logic [31:0] write_data_B;
-logic write_enable_B;
+logic [6:0] CSCT_B_write_address;
+logic [31:0] CSCT_B_write_data;
+logic CSCT_B_w_en;
 
 logic CS_done;
 logic CT_done;
@@ -167,32 +167,36 @@ assign matrix_A_val_1 = read_data0_b;
 
 always comb begin
 	if(FS_done == 1'd1) begin
-		DP_address0_a <= read_address_A0;
-		DP_address0_b <= ;
-		DP_address1_a <= write_address_B;
-		DP_address1_b <= ;// this is for vithu
+		DP_address0_a <= CSCT_A0_read_address;
+		DP_address0_b <= ;// this is for vithu
+		DP_address1_a <= CSCT_B_write_address;
+		DP_address1_b <= 7'd0;// nobody
 
-		read_data_A0 <= read_data0_a;
+		CSCT_A0_read_data <= read_data0_a;
 		// read_data_A1 <= read_data0_b;
+		write_data0_a <= 32'd0;
+		write_data1_a <= CSCT_B_write_data;
 
-		write_enable0_a <= write_enable_A0;
-		// write_enable0_b <= write_enable_A1;
-		write_enable1_a <= write_enable_B;
+		write_enable0_a <= CSCT_A0_w_en;
+		write_enable0_b <= ;// for vithu
+		write_enable1_a <= CSCT_B_w_en;
+		write_enable1_b <= 1'd0;// nobody
 
 	end else begin 
-		write_enable1_b <= FS_DP_write_enable;// this is for vithu
-		DP_address0_a <= write_address_B;
+		DP_address0_a <= CSCT_B_write_address;
 		DP_address0_b <= FS_DP_address; // this is for vithu
-		DP_address1_a <= read_address_A0;
-		DP_address1_b <= read_address_A1;
+		DP_address1_a <= CSCT_A0_read_address;
+		DP_address1_b <= ;// nobody
 
-		read_data0_a0 <= read_data1_a;
-		read_data0_a1 <= read_data1_b;
+		CSCT_A0_read_data <= read_data1_a;
+		// read_data0_a1 <= read_data1_b;
+		write_data0_a <= CSCT_B_write_data;
+		write_data1_a <= 32'd0;
 
-		write_enable0_a <= write_enable0_b;
-		write_enable0_b <= ; // this is for vithu
-		write_enable1_a <= write_enable0_a0;
-		write_enable1_b <= write_enable0_a1;
+		write_enable0_a <= CSCT_B_w_en;
+		write_enable0_b <= FS_DP_write_enable; // this is for vithu
+		write_enable1_a <= CSCT_A0_w_en;
+		write_enable1_b <= //nobody
 	end 
 end
 
@@ -415,14 +419,14 @@ always @(posedge Clock or negedge Resetn) begin
 		// write_enable1_a <= 1'b0;
 		// write_enable1_b <= 1'b0;
 
-		read_address_A0 <= 7'd0;
+		CSCT_A0_read_address <= 7'd0;
 		read_address_A1 <= 7'd1;
 		
 		
 		write_enable0_a0 <= 1'b0;
 		write_enable0_a1 <= 1'b0;
 
-		write_address_B <= 7'b0;
+		CSCT_B_write_address <= 7'b0;
 		write_data0_b <= 32'd0;
 		write_enable0_b <= 1'b0;
 
