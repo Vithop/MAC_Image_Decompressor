@@ -106,11 +106,8 @@ logic FS_done;
 
 //Signals for Calculations
 logic [6:0] CSCT_A0_read_address;
-	// logic [6:0] read_address_A1;
 logic [31:0] CSCT_A0_read_data;
-	// logic [31:0] read_data_A1;
 logic CSCT_A0_w_en;
-	// logic write_enable_A1;
 
 logic [6:0] CSCT_B_write_address;
 logic [31:0] CSCT_B_write_data;
@@ -404,38 +401,27 @@ always @(posedge Clock or negedge Resetn) begin
 		// reset
 		A_i <= 4'd0;
 		A_j <= 4'd0;
-
-		// SRAM_we_n <= 1'b1;
-		// SRAM_write_data <= 16'd0;
-		// SRAM_address <= 16'd0;
-		// DP_address0_a <= 7'd0;
-		// DP_address0_b <= 7'd0;
-		// write_data0_a <= 32'd0;
-		// write_data0_b <= 32'd0;
-		// write_enable0_a <= 1'b0;
-		// write_enable0_b <= 1'b0;
-
-		// DP_address1_a <= 7'd0;
-		// DP_address1_b <= 7'd0;
-		// write_data1_a <= 32'd0;
-		// write_data1_b <= 32'd0;
-		// write_enable1_a <= 1'b0;
-		// write_enable1_b <= 1'b0;
+		B_i <= 4'd0;
+		B_j <= 4'd0;
+		Ic0 <= 3'd0;
+		Jc0 <= 3'd0;
+		Ic1 <= 3'd0;
+		Jc1 <= 3'd1;
 
 		CSCT_A0_read_address <= 7'd0;
-		read_address_A1 <= 7'd1;
+		CSCT_B_write_address <= 7'd0;
 		
-		
-		write_enable0_a0 <= 1'b0;
-		write_enable0_a1 <= 1'b0;
+		CSCT_B_write_data <= 32'd0;
 
-		CSCT_B_write_address <= 7'b0;
-		write_data0_b <= 32'd0;
-		write_enable0_b <= 1'b0;
+		CSCT_A0_w_en <= 1'b0;
+		CSCT_B_w_en <= 1'b0;
 
 		M2_state <= S_M2_IDLE;
 	end	else begin
-		case(M2_C_state)
+		case(M2_CSCT_state)
+			S_CTCS_wait: begin
+				M2
+			end
 			S_M2_CT_LI_init: begin
 				write_enable0_a <= 1'd0;
 				write_enable0_b <= 1'd0;
