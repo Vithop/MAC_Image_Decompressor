@@ -442,6 +442,7 @@ always @(posedge Clock or negedge Resetn) begin
 				YUV_i = YUV_i + 3'd1;
 			end 
 			S_M2_WS_END:begin
+				M2_state <= S_M2_;// Go somewhere
 				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
 				YUV_block_address <= (((YUV_block_address+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_address + 17'd4;
