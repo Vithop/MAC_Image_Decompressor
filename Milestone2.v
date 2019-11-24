@@ -103,6 +103,7 @@ logic [3:0] A_j;
 logic [15:0] matrix_A_row [7:0];
 logic [7:0] matrix_A_val_0;
 logic [7:0] matrix_A_val_1;
+logic [6:0] last_read_address;
 // logic [7:0] matrix_A_val_2;
 
 // B will be the result matrix
@@ -309,9 +310,9 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_CT_LI_READ_DELAY_2: begin
 				DP_address_a <= DP_address_a + 6'd2;
 				DP_address_b <= DP_address_b + 6'd2;
-				M2_state <= S_M2_CT_READ;
+				M2_state <= S_M2_CT_LI_CALC;
 			end
-			S_M2_CT_READ: begin
+			S_M2_CT_LI_CALC: begin
 				Jc0 <= Jc0 + 3'd2;
 				Jc1 <= Jc1 + 3'd2;
 				matrix_A_row[5] <= matrix_A_val[7];
@@ -321,30 +322,25 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[1] <= matrix_A_val[3];
 				matrix_A_row[0] <= matrix_A_val[2];
 
-				A_i <= A_i + 3'd2;
+				A_i <= A_i + 4'd2;
 				temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
 
-				if (A_i < 3'd7) begin
+
+				if (A_i < 4'd6) begin
+					if (A_i > 4'd2) begin
+						DP_address_a <= DP_address_a + 6'd2;
+						DP_address_b <= DP_address_b + 6'd2;
+					end 
 					matrix_A_row[7] <= matrix_A_val_1
 					matrix_A_row[6] <= matrix_A_val_0;
-					DP_address_a <= DP_address_a + 6'd2;
-					DP_address_b <= DP_address_b + 6'd2;
-					M2_state <= S_M2_CT_LI_read;
+					M2_state <= S_M2_CT_LI_CALC;
 				end else begin
 					matrix_A_row[7] <= matrix_A_val[1];
 					matrix_A_row[6] <= matrix_A_val[0];
 					DP_address_a <= init_T_address;
-					write_data_a <= temp_B_val_0;
-					// B_i <= 3'd0;
-					B_j <= B_j + 4'd1;
-					// DP_address_b <= DP_address_b + 6'd2;
-					write_enable_a <= 1'b1;
+					last_read_address <= DP_address_a
 					A_i <= 3'd0;
-					Ic0 <= Ic0 + 3'd1;
-					Jc0 <= 3'd0;
-					Ic1 <= Ic1 + 3'd1;
-					Jc1 <= 3'd1;
-					M2_state <= S_M2_LI_NEXT_ROW;
+					M2_state <= S_M2_CT_LI_CALC_B_ROW;
 				end
 			end
 			S_M2_CT_LI_CALC_B_ROW: begin
@@ -359,17 +355,24 @@ always @(posedge Clock or negedge Resetn) begin
 				matrix_A_row[1] <= matrix_A_val[3];
 				matrix_A_row[0] <= matrix_A_val[2];
 				
-				A_i <= A_i + 3'd2;
-				temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
 				
 
-				if(B_j < 8'd56) begin
-					if(A_i < 3'd6) begin 
+				if(B_j < 4'd7 && A_i < 4'd6) begin
+					if(A_i > 4'd0) begin
+						A_i <= A_i + 4'd2;
+						temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
 						write_enable_a <= 1'b0;
 					end else begin
-						write_enable_a <= 1'b1;
-						write_data_a <= temp_B_val_0;
-						DP_address_a <= init_T_address + 6'd8 + B_i;
+						if(B_j == 4'd7 && A_i > 4'd2) begin
+							DP_address_a <= DP_address_a + 6'd2;
+							DP_address_b <= DP_address_b + 6'd2;
+						end
+					// Use Second DPRAM for writing calculation results to
+						write_enable2_a <= 1'b1;
+						DP_address2_a <= B_j == 4'd0 ? DP_address_a : DP_address_a + 6'd8 + B_i;;
+						write_data2_a <= temp_B_val_0;
+						temp_B_val_0 <= result_a + result_b;
+						// B_i <= 3'd0;
 						B_j <= B_j + 4'd1;
 						Ic0 <= Ic0 + 3'd1;
 						Jc0 <= 3'd0;
@@ -378,10 +381,12 @@ always @(posedge Clock or negedge Resetn) begin
 					end
 					M2_state <= S_M2_CT_LI_CALC_B_ROW;
 				end else begin
-					DP_address_a <= init_T_address + 6'd8 + B_i;
+					write_enable_a <= 1'b0;
+					DP_address_a <= last_read_address + 6'd2;
+					DP_address_b <= last_read_address + 6'd2;
 					B_i <= B_i + 3'd1;
 					A_j <= A_j + 3'd1;
-					M2_state <= S_M2_CT_LI_read;
+					M2_state <= S_M2_CT_LI_READ_DELAY_1;
 				end
 			end
 			// S_M2_LO_READ_BLOCK0:begin
