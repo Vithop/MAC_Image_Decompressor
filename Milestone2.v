@@ -131,6 +131,7 @@ longint Op4;
 
 assign next_row_preIDCT = (Reading_Y_flag)?18'd320:18'd160;
 assign next_row_postIDCT = (Reading_Y_flag)?18'd160:18'd80;
+assign Reading_Y_flag <= (block_index >= 18'd153600)?1'b0:1'b1;
 
 assign temp_a = (Op1 * Op2);
 assign temp_b = (Op3 * Op4);
@@ -255,36 +256,17 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_FS_NEXT_ROW:begin
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
-				if (preIDCT_i == 4'd7) begin
-				 	preIDCT_i <= 4'd0;
-				end else begin
-					preIDCT_i <= preIDCT_i + 4'd1;
-				end
-
+				preIDCT_i <= (preIDCT_i == 4'd7)? 4'd0: preIDCT_i + 4'd1;
 				if (preIDCT_j < 4'd7) begin
 				 	preIDCT_j <= preIDCT_j + 4'd1;
 				 	row_address <= row_address + next_row_preIDCT
 					M2_state <= S_M2_FS_READ_BLOCK_ROW; 
 					SRAM_address <= block_index + preIDCT_i + row_address;				 	
-				 end else begin
+				end else begin
 				 	preIDCT_j <= 4'd0;
 					row_address <= 17'd0;
 					M2_state <= S_M2_LO_READ_BLOCK1; 
-				 end
-			
-				/* MOVE To COMMON STATE FS
-				// if (SRAM_address == 17'd230399) begin
- 				//	 	M2_state <= S_M2_LO_READ_BLOCK0;
-				// end else begin
-				// 	SRAM_address <= block_index + A_i + row_address;
-				//  	M2_state <= S_M2_READ_BLOCK_ROW;			 	
-				// end
-				 	// if(((block_index + 17'd8)%17'd320) == 0)begin
-				 	// 	block_index <= SRAM_address + 17'd1;
-				 	// end else begin
-				 	// 	block_index <= block_index + 17'd8;				 		
-				 	// end
-			 	*/
+				end
 			end
 			S_M2_FS_LO_READ_BLOCK0:begin
 				M2_state <= S_M2_FS_LO_READ_BLOCK0;
@@ -300,6 +282,9 @@ always @(posedge Clock or negedge Resetn) begin
 				M2_state <= S_M2_IDLE;
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
+				/* MOVE To COMMON STATE FS		 	
+				 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
+			 	*/
 			end
 			S_M2_CT_LI_init: begin
 				write_enable_a <= 1'd0;
@@ -339,7 +324,7 @@ always @(posedge Clock or negedge Resetn) begin
 				A_i <= A_i + 3'd2;
 				temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
 
-				if (A_i < 3'd) begin
+				if (A_i < 3'd7) begin
 					matrix_A_row[7] <= matrix_A_val_1
 					matrix_A_row[6] <= matrix_A_val_0;
 					DP_address_a <= DP_address_a + 6'd2;
@@ -424,17 +409,13 @@ always @(posedge Clock or negedge Resetn) begin
 				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
 				YUV_i = YUV_i + 3'd1;
-				if (YUV_i < 3'd2) begin
-					M2_state <= S_M2_WS_WRITE_S_ROW;
-				end else begin
-					M2_state <= S_M2_WS_WRITE_S_NEXT_ROW
-				end
+				M2_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
 			end
 			S_M2_WS_WRITE_S_NEXT_ROW: begin
 				DP_address2_a <= DP_address2_a + 7'd2;
 				SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				SRAM_write_data <= {read_data2_a[7:0], read_data2_b[7:0]};
-				YUV_i = YUV_i + 3'd1;
+				YUV_i <= (YUV_i == 3'd3)?3'd0: YUV_i + 3'd1;
 				if (YUV_j < 3'd3) begin
 					YUV_row_address <= YUV_row_address + next_row_postIDCT;
 					YUV_j <= YUV_j + 3'd1;
