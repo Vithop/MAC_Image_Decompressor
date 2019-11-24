@@ -69,33 +69,36 @@ typedef enum logic [4:0]{
 } Milestone1_state_type;
 
 typedef enum logic [3:0]{
-	S_M2_IDLE,
-	S_M2_LI_READ_BLOCK,
-	S_M2_CALC_T,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2
-} Milestone2_FWstate_type;
+	S_M2_FS_IDLE,
+	S_M2_FS_LI_READ_BLOCK_1,
+	S_M2_FS_LI_READ_BLOCK_2,
+	S_M2_FS_READ_BLOCK_ROW,
+	S_M2_FS_NEXT_ROW,
+	S_M2_FS_LO_READ_BLOCK0,
+	S_M2_FS_LO_READ_BLOCK1,
+	S_M2_FS_LO_READ_BLOCK2,
+	S_M2_FS_WAIT
+} Milestone2_FS_state_type;
 
 typedef enum logic [3:0]{
-	S_M2_IDLE,
-	S_M2_LI_READ_BLOCK,
-	S_M2_CALC_T,
-	S_M2_,
-	S_M2_,
-	S_M2_,
-	S_M2	
-} Milestone2_Cstate_type;
+	S_M2_WS_WAIT,
+	S_M2_WS_START_READ,
+	S_M2_WS_LI_READ_S0,
+	S_M2_WS_LI_READ_S1,
+	S_M2_WS_WRITE_S_ROW,
+	S_M2_WS_WRITE_S_NEXT_ROW,
+	S_M2_WS_WRITE_S_LO_0,
+	S_M2_WS_WRITE_S_LO_1
+} Milestone2_WS_state_type;
+
+typedef enum logic [3:0]{
+	S_CTCS_wait,
+	S_M2_CT_LI_init,
+	S_M2_CT_LI_READ_DELAY_1,
+	S_M2_CT_LI_READ_DELAY_2,
+	S_M2_CT_LI_CALC,
+	S_M2_CT_LI_CALC_B_ROW
+} Milestone2_CTCS_state_type;
 
 
 `define DEFINE_STATE 1
