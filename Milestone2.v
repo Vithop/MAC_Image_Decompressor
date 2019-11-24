@@ -24,9 +24,9 @@ module Milestone2 (
 
 );
 
-Milestone2_state_type M2_FS_state;
-Milestone2_state_type M2_WS_state;
-Milestone2_state_type M2_C_state;
+Milestone2_FS_state_type M2_FS_state;
+Milestone2_WS_state_type M2_WS_state;
+Milestone2_CTCS_state_type M2_CTCS_state;
 
 //address base values const
 parameter intit_Y_address = 18'd0,
@@ -209,7 +209,7 @@ always comb begin
 end
 
 always comb begin
-	if(M2_state == S_M2_CT_LI_read || S_M2_CT_LI_CALC_B_ROW)begin
+	if((M2_CTCS_state == S_M2_CT_LI_read) || (M2_CTCS_state == S_M2_CT_LI_CALC_B_ROW)begin
 		Op1 = matrix_A_row[7];
 		Op2 = matrix_C_val0;
 		Op3 = matrix_A_row[6];
@@ -246,30 +246,30 @@ always @(posedge Clock or negedge Resetn) begin
 					FS_DP_write_enable <= 1'd0;
 					FS_DP_address <=  6'd0;
 					FS_done <= 1'b0;
-					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
+					M2_FS_state <= S_M2_FS_LI_READ_BLOCK_1;
 				end 
 				
 			end
 			S_M2_FS_LI_READ_BLOCK_1:begin
 				FS_SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
-				M2_state <= S_M2_LI_READ_BLOCK_2
+				M2_FS_state <= S_M2_LI_READ_BLOCK_2
 			end
 			S_M2_FS_LI_READ_BLOCK_2:begin
 				FS_SRAM_address <= block_index + preIDCT_i + row_address;
 				preIDCT_i <= preIDCT_i + 4'd1;
 				FS_DP_write_enable <= 1'b1;
  				write_data0_b <= SRAM_read_data;
-				M2_state <= S_M2_READ_BLOCK_ROW;
+				M2_FS_state <= S_M2_READ_BLOCK_ROW;
 			end
 			S_M2_FS_READ_BLOCK_ROW:begin
 				FS_SRAM_address <= block_index + preIDCT_i + row_address;
 				FS_DP_address <= FS_DP_address + 1;
 				write_data0_b <= SRAM_read_data;
 				if (preIDCT_i < 4'd6) begin
-				 	M2_state <= S_M2_READ_BLOCK_ROW;
+				 	M2_FS_state <= S_M2_READ_BLOCK_ROW;
 				end else begin
-				 	M2_state <= S_M2_LI_NEXT_ROW;
+				 	M2_FS_state <= S_M2_LI_NEXT_ROW;
 				end
 			end
 			S_M2_FS_NEXT_ROW:begin
@@ -279,26 +279,26 @@ always @(posedge Clock or negedge Resetn) begin
 				if (preIDCT_j < 4'd7) begin
 				 	preIDCT_j <= preIDCT_j + 4'd1;
 				 	row_address <= row_address + next_row_preIDCT
-					M2_state <= S_M2_FS_READ_BLOCK_ROW; 
+					M2_FS_state <= S_M2_FS_READ_BLOCK_ROW; 
 					FS_SRAM_address <= block_index + preIDCT_i + row_address;				 	
 				end else begin
 				 	preIDCT_j <= 4'd0;
 					row_address <= 17'd0;
-					M2_state <= S_M2_LO_READ_BLOCK1; 
+					M2_FS_state <= S_M2_LO_READ_BLOCK1; 
 				end
 			end
 			S_M2_FS_LO_READ_BLOCK0:begin
-				M2_state <= S_M2_FS_LO_READ_BLOCK0;
+				M2_FS_state <= S_M2_FS_LO_READ_BLOCK0;
 				FS_DP_address <= FS_DP_address + 1;
 				write_data0_b <= FS_SRAM_read_a;
 			end
 			S_M2_FS_LO_READ_BLOCK1:begin
-				M2_state <= S_M2_FS_LO_READ_BLOCK2;
+				M2_FS_state <= S_M2_FS_LO_READ_BLOCK2;
 				FS_DP_address <= FS_DP_address + 1;
 				write_data0_b <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK2:begin
-				M2_state <= S_M2_FS_WAIT;
+				M2_FS_state <= S_M2_FS_WAIT;
 				FS_DP_address <= FS_DP_address + 1;
 				write_data0_b <= SRAM_read_data;
 				block_index <= (((block_index + 18'd8)%18'd320) == 0)? FS_SRAM_address + 18'd1:block_index + 18'd8;
@@ -312,7 +312,7 @@ always @(posedge Clock or negedge Resetn) begin
 					preIDCT_j <= 4'd0;
 					FS_DP_write_enable <= 1'd0;
 					FS_DP_address <=  6'd0;
-					M2_state <= S_M2_FS_LI_READ_BLOCK_1;
+					M2_FS_state <= S_M2_FS_LI_READ_BLOCK_1;
 					FS_done <= 1'b0;
 				end else begin
 					M2_FS_state <= S_M2_FS_WAIT;
@@ -329,7 +329,7 @@ always @(posedge Clock or negedge Resetn) begin
 		WS_SRAM_write_data <= 16'd0;
 		WS_SRAM_address <= 16'd0;
 
-		WS_DP_address <= 7'd0;
+		WS_DP_address <= 7'd64;
 		WS_DP_write_enable <= 1'b0;
 
 		YUV_block_address <= 17'd0;
@@ -343,7 +343,7 @@ always @(posedge Clock or negedge Resetn) begin
 				M2_WS_state <= (CS_done)? S_M2_WS_START_READ: S_M2_WS_WAIT;
 			end
 			S_M2_WS_START_READ:begin
-				WS_DP_address <= 7'd0;
+				WS_DP_address <= 7'd64;
 				WS_DP_write_enable <= 1'b0;
 				YUV_buff <= 8'd0
 				YUV_row_address <= 17'd0;
@@ -357,14 +357,14 @@ always @(posedge Clock or negedge Resetn) begin
 			S_M2_WS_LI_READ_S1:begin
 				WS_DP_address <= WS_DP_address + 7'd1;
 				YUV_buff <= read_data1_a[7:0];
-				M2_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
+				M2_WS_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
 			end
 			S_M2_WS_WRITE_S_ROW:begin
 				WS_DP_address <= WS_DP_address + 7'd1;
 				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				WS_SRAM_write_data <= {YUV_buff, read_data1_b[7:0]};
 				YUV_i = YUV_i + 3'd1;
-				M2_state <= S_M2_WS_LI_READ_S1;
+				M2_WS_state <= S_M2_WS_LI_READ_S1;
 			end
 			S_M2_WS_WRITE_S_NEXT_ROW: begin
 				WS_DP_address <= WS_DP_address + 7'd1;
@@ -374,15 +374,15 @@ always @(posedge Clock or negedge Resetn) begin
 				if (YUV_j < 3'd3) begin
 					YUV_row_address <= YUV_row_address + next_row_postIDCT;
 					YUV_j <= YUV_j + 3'd1;
-					M2_state <= S_M2_WS_WRITE_S_ROW;
+					M2_WS_state <= S_M2_WS_WRITE_S_ROW;
 				end else begin
-					M2_state <= S_M2_WS_WRITE_S_LO_0
+					M2_WS_state <= S_M2_WS_WRITE_S_LO_0
 				end
 			end
 			S_M2_WS_WRITE_S_LO_0:begin
 				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
 				YUV_buff <= read_data1_a[7:0];
-				M2_state <= S_M2_WS_WRITE_S_LO_1;
+				M2_WS_state <= S_M2_WS_WRITE_S_LO_1;
 			end
 			S_M2_WS_WRITE_S_LO_1:begin
 				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address
@@ -416,9 +416,9 @@ always @(posedge Clock or negedge Resetn) begin
 		CSCT_A0_w_en <= 1'b0;
 		CSCT_B_w_en <= 1'b0;
 
-		M2_state <= S_M2_IDLE;
+		M2_CTCS_state <= S_CTCS_wait;
 	end	else begin
-		case(M2_CSCT_state)
+		case(M2_CTCS_state)
 			S_CTCS_wait: begin
 				M2
 			end
@@ -435,17 +435,17 @@ always @(posedge Clock or negedge Resetn) begin
 				Jc0 <= 3'd0;
 				Ic1 <= 3'd0;
 				Jc1 <= 3'd1;
-				M2_state <= S_M2_CT_LI_READ_DELAY_1;
+				M2_CTCS_state <= S_M2_CT_LI_READ_DELAY_1;
 			end
 			S_M2_CT_LI_READ_DELAY_1: begin
 				DP_address0_a <= DP_address0_a + 6'd2;
 				DP_address0_b <= DP_address0_b + 6'd2;
-				M2_state <= S_M2_CT_LI_READ_DELAY_2;
+				M2_CTCS_state <= S_M2_CT_LI_READ_DELAY_2;
 			end
 			S_M2_CT_LI_READ_DELAY_2: begin
 				DP_address0_a <= DP_address0_a + 6'd2;
 				DP_address0_b <= DP_address0_b + 6'd2;
-				M2_state <= S_M2_CT_LI_CALC;
+				M2_CTCS_state <= S_M2_CT_LI_CALC;
 			end
 			S_M2_CT_LI_CALC: begin
 				Jc0 <= Jc0 + 3'd2;
@@ -468,14 +468,14 @@ always @(posedge Clock or negedge Resetn) begin
 					end 
 					matrix_A_row[7] <= matrix_A_val_1
 					matrix_A_row[6] <= matrix_A_val_0;
-					M2_state <= S_M2_CT_LI_CALC;
+					M2_CTCS_state <= S_M2_CT_LI_CALC;
 				end else begin
 					matrix_A_row[7] <= matrix_A_val[1];
 					matrix_A_row[6] <= matrix_A_val[0];
 					DP_address0_a <= init_T_address;
 					last_read_address <= DP_address0_a
 					A_i <= 3'd0;
-					M2_state <= S_M2_CT_LI_CALC_B_ROW;
+					M2_CTCS_state <= S_M2_CT_LI_CALC_B_ROW;
 				end
 			end
 			S_M2_CT_LI_CALC_B_ROW: begin
@@ -512,17 +512,17 @@ always @(posedge Clock or negedge Resetn) begin
 						Ic1 <= Ic1 + 3'd1;
 						Jc1 <= 3'd1;
 					end
-					M2_state <= S_M2_CT_LI_CALC_B_ROW;
+					M2_CTCS_state <= S_M2_CT_LI_CALC_B_ROW;
 				end else begin
 					write_enable0_a <= 1'b0;
 					DP_address0_a <= last_read_address + 6'd2;
 					DP_address0_b <= last_read_address + 6'd2;
 					B_i <= B_i + 3'd1;
 					A_j <= A_j + 3'd1;
-					M2_state <= S_M2_CT_LI_READ_DELAY_1;
+					M2_CTCS_state <= S_M2_CT_LI_READ_DELAY_1;
 				end
 			end
-			default: M2_state <= S_M2_IDLE;
+			default: M2_CTCS_state <= S_CTCS_wait;
 		endcase
 	end
 end
