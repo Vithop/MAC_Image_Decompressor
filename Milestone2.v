@@ -209,7 +209,7 @@ assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 
 always_comb begin
-	if(M2_CTCS_state == S_M2_CTCS_LI_read || M2_CTCS_state == S_M2_CTCS_LI_CALC_B_ROW)begin
+	if(M2_CTCS_state == S_M2_CTCS_LI_init || M2_CTCS_state == S_M2_CTCS_LI_READ_DELAY_1)begin
 		Op1 = matrix_A_row[0];
 		Op2 = matrix_C_val0;
 		Op3 = matrix_A_row[1];
@@ -460,7 +460,7 @@ always @(posedge Clock or negedge Resetn) begin
 					CTCS_A0_read_address <= CTCS_A0_read_address + 6'd1;
 				end
 				A_i <= A_i == 4'd7 ? 4'd0 : A_i + 4'd1;
-				M2_state <= (A_i < 4'd7)
+				M2_CTCS_state <= (A_i < 4'd7)
 					? S_M2_CTCS_LI_READ_buffer_row : S_M2_CTCS_CALC_B_ROW;
 			end
 			S_M2_CTCS_CALC_B_ROW: begin
@@ -480,13 +480,13 @@ always @(posedge Clock or negedge Resetn) begin
 
 				if(B_j > 4'd5) begin
 					nxt_matrix_A_row[7] <= CTCS_A0_read_data;
-					nxt_matrix_A_row[6] <= nxt_matrix_A_row[7]
-					nxt_matrix_A_row[5] <= nxt_matrix_A_row[6]
-					nxt_matrix_A_row[4] <= nxt_matrix_A_row[5]
-					nxt_matrix_A_row[3] <= nxt_matrix_A_row[4]
-					nxt_matrix_A_row[2] <= nxt_matrix_A_row[3]
-					nxt_matrix_A_row[1] <= nxt_matrix_A_row[2]
-					nxt_matrix_A_row[0] <= nxt_matrix_A_row[1]
+					nxt_matrix_A_row[6] <= nxt_matrix_A_row[7];
+					nxt_matrix_A_row[5] <= nxt_matrix_A_row[6];
+					nxt_matrix_A_row[4] <= nxt_matrix_A_row[5];
+					nxt_matrix_A_row[3] <= nxt_matrix_A_row[4];
+					nxt_matrix_A_row[2] <= nxt_matrix_A_row[3];
+					nxt_matrix_A_row[1] <= nxt_matrix_A_row[2];
+					nxt_matrix_A_row[0] <= nxt_matrix_A_row[1];
 				end
 				
 				if(A_i < 4'd6) begin
@@ -497,13 +497,13 @@ always @(posedge Clock or negedge Resetn) begin
 					M2_CTCS_state <= S_M2_CTCS_CALC_B_ROW;
 				end else begin
 					A_i <= 4'd0;
-					B_j <= B_j + 4'd1
+					B_j <= B_j + 4'd1;
 					Ic0 <= Ic0 + 3'd1;
 					Jc0 <= 3'd0;
 					Ic1 <= Ic1 + 3'd0;
 					Jc1 <= 3'd1;
 					temp_B_val_0 <= temp_B_val_0 + result_a + result_b;
-					M2_CTCS_state <= S_M2_CTCS_CALC_B_NEXT_ROW
+					M2_CTCS_state <= S_M2_CTCS_CALC_B_NEXT_ROW;
 				end
 
 			end

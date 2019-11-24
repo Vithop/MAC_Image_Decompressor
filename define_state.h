@@ -93,11 +93,12 @@ typedef enum logic [3:0]{
 
 typedef enum logic [3:0]{
 	S_CTCS_wait,
-	S_M2_CT_LI_init,
-	S_M2_CT_LI_READ_DELAY_1,
-	S_M2_CT_LI_READ_DELAY_2,
-	S_M2_CT_LI_CALC,
-	S_M2_CT_LI_CALC_B_ROW
+	S_M2_CTCS_LI_init,
+	S_M2_CTCS_LI_READ_DELAY_1,
+	S_M2_CTCS_LI_READ_DELAY_2,
+	S_M2_CTCS_LI_READ_buffer_row,
+	S_M2_CTCS_CALC_B_ROW,
+	S_M2_CTCS_CALC_B_NEXT_ROW
 } Milestone2_CTCS_state_type;
 
 
