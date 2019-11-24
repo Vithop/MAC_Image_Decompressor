@@ -147,9 +147,9 @@ longint Op2;
 longint Op3;
 longint Op4;
 
-assign next_row_preIDCT = (Reading_Y_flag)?18'd320:18'd160;
-assign next_row_postIDCT = (Reading_Y_flag)?18'd160:18'd80;
-assign Reading_Y_flag <= (block_index >= 18'd153600)?1'b0:1'b1;
+assign next_row_preIDCT = (Reading_Y_flag) ? 18'd320 : 18'd160;
+assign next_row_postIDCT = (Reading_Y_flag) ? 18'd160 : 18'd80;
+assign Reading_Y_flag <= (block_index >= 18'd153600) ? 1'b0 : 1'b1;
 
 assign temp_a = (Op1 * Op2);
 assign temp_b = (Op3 * Op4);
@@ -223,11 +223,6 @@ always comb begin
 		Op2 = matrix_C_val0;
 		Op3 = matrix_A_row[6];
 		Op4 = matrix_C_val1;
-	end else if (M2_state == ) begin
-		Op1 = ;
-		Op2 = ;
-		Op3 = ;
-		Op4 = ;
 	end else begin
 		Op1 = 31'd0;
 		Op2 = 31'd0;
@@ -417,26 +412,36 @@ end
 always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		// reset
-		SRAM_we_n <= 1'b1;
-		SRAM_write_data <= 16'd0;
-		SRAM_address <= 16'd0;
-		block_index <= init_PreIDCT_address;
 		A_i <= 4'd0;
 		A_j <= 4'd0;
 
-		DP_address_a <= 7'd0;
-		DP_address_b <= 7'd0;
-		write_data_a <= 32'd0;
-		write_data_b <= 32'd0;
-		write_enable_a <= 1'b0;
-		write_enable_b <= 1'b0;
+		// SRAM_we_n <= 1'b1;
+		// SRAM_write_data <= 16'd0;
+		// SRAM_address <= 16'd0;
+		// DP_address_a <= 7'd0;
+		// DP_address_b <= 7'd0;
+		// write_data_a <= 32'd0;
+		// write_data_b <= 32'd0;
+		// write_enable_a <= 1'b0;
+		// write_enable_b <= 1'b0;
 
-		DP_address2_a <= 7'd0;
-		DP_address2_b <= 7'd0;
-		write_data2_a <= 32'd0;
-		write_data2_b <= 32'd0;
-		write_enable2_a <= 1'b0;
-		write_enable2_b <= 1'b0;
+		// DP_address2_a <= 7'd0;
+		// DP_address2_b <= 7'd0;
+		// write_data2_a <= 32'd0;
+		// write_data2_b <= 32'd0;
+		// write_enable2_a <= 1'b0;
+		// write_enable2_b <= 1'b0;
+
+		read_address_A0 <= 7'd0;
+		read_address_A1 <= 7'd1;
+		
+		
+		write_enable_A0 <= 1'b0;
+		write_enable_A1 <= 1'b0;
+
+		write_address_B <= 7'b0;
+		write_data_B <= 32'd0;
+		write_enable_B <= 1'b0;
 
 		M2_state <= S_M2_IDLE;
 	end	else begin
