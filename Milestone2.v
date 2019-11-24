@@ -159,7 +159,7 @@ assign result_b = {temp_b[31:0]};
 assign matrix_A_val_0 = read_data_a;
 assign matrix_A_val_1 = read_data_b;
 
-always comb beginew
+always comb begin
 	if(end_FS == 1'd1) begin
 		DP_address_a <= read_address_A0;
 		DP_address_b <= read_address_A1;
@@ -208,20 +208,10 @@ always @(posedge Clock or negedge Resetn) begin
 		A_j <= 4'd0;
 
 		DP_address_a <= 7'd0;
-		DP_address_b <= 7'd0;
 		write_data_a <= 32'd0;
-		write_data_b <= 32'd0;
 		write_enable_a <= 1'b0;
-		write_enable_b <= 1'b0;
 
-		DP_address2_a <= 7'd0;
-		DP_address2_b <= 7'd0;
-		write_data2_a <= 32'd0;
-		write_data2_b <= 32'd0;
-		write_enable2_a <= 1'b0;
-		write_enable2_b <= 1'b0;
-
-		M2_state <= S_M2_IDLE;
+		M2_FS_state <= S_M2_IDLE;
 	end else begin
 		case(M2_FS_state)
 			S_M2_FS_IDLE:begin
@@ -282,12 +272,14 @@ always @(posedge Clock or negedge Resetn) begin
 				write_data_a <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK2:begin
-				M2_state <= S_M2_IDLE;
+				M2_state <= S_M2_FS_WAIT;
 				DP_address_a <= DP_address_a + 1;
 				write_data_a <= SRAM_read_data;
-				// MOVE To COMMON STATE FS		 	
-				// 	block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
-			 	//
+				block_index <= (((block_index + 18'd8)%18'd320) == 0)? SRAM_address + 18'd1:block_index + 18'd8;
+			end
+			S_M2_FS_WAIT:begin
+				
+				M2_state <= S_M2_IDLE;
 			end
 			default: M2_FWstate <= S_M2_FS_IDLE;
 		endcase
