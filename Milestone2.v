@@ -110,11 +110,14 @@ logic [31:0] CTCS_A0_read_data;
 logic CTCS_A0_w_en;
 
 logic [6:0] CTCS_B_write_address;
+logic [6:0] CTCS_B_write_init_address;
 logic [31:0] CTCS_B_write_data;
 logic CTCS_B_w_en;
 
 logic CS_done;
 logic CT_done;
+logic CS_start;
+logic CT_start;
 
 	// General Matrix A that will represent S' or T
 logic [3:0] A_i;
@@ -171,34 +174,35 @@ always_comb begin
 		DP_address0_a = CTCS_A0_read_address;
 		DP_address0_b = WS_DP_address;// this is for vithu
 		DP_address1_a = CTCS_B_write_address;
-		DP_address1_b = 7'd0;// nobody :(
+		DP_address1_b = CS_start ? CTCS_A0_read_address : 7'd0;// nobody :(
 
-		CTCS_A0_read_data = read_data0_a;
+		CTCS_A0_read_data = (CS_start) ? read_data1_b : read_data0_a;
 		write_data0_a = 32'd0;
 		write_data1_a = CTCS_B_write_data;
+		CTCS_B_write_init_address <= 7'd0;
 
-		write_enable0_a = CTCS_A0_w_en;
+		write_enable0_a = (CS_start) ? 1'd0 : CTCS_A0_w_en;
 		write_enable0_b = WS_DP_write_enable;// for vithu
 		write_enable1_a = CTCS_B_w_en;
-		write_enable1_b = 1'd0;// nobody
-
+		write_enable1_b = (CS_start) ? CTCS_A0_w_en : 1'd0;
 	end else begin 
 		SRAM_we_n = 1'b1;	
 		SRAM_write_data = 16'd0;
 		SRAM_address = FS_SRAM_address;
 
 		DP_address0_a = CTCS_B_write_address;
-		DP_address0_b = FS_DP_address; // this is for vithu
+		DP_address0_b = (CT_start) ? CTCS_A0_read_address : FS_DP_address; // this is for vithu
 		DP_address1_a = CTCS_A0_read_address;
 		DP_address1_b = 7'd0;// nobody :(
 
-		CTCS_A0_read_data = read_data1_a;
+		CTCS_A0_read_data = (CT_start) ? read_data0_b : read_data1_a;
 		write_data0_a = CTCS_B_write_data;
 		write_data1_a = 32'd0;
+		CTCS_B_write_init_address <= 7'd64;
 
 		write_enable0_a = CTCS_B_w_en;
-		write_enable0_b = FS_DP_write_enable; // this is for vithu
-		write_enable1_a = CTCS_A0_w_en;
+		write_enable0_b = (CT_start) ? CTCS_A0_w_en : FS_DP_write_enable; // this is for vithu
+		write_enable1_a = (CT_start) ? CTCS_A0_w_en : 1'd0;
 		write_enable1_b = 1'b0; //nobody :(
 	end 
 end
@@ -464,16 +468,23 @@ always @(posedge Clock or negedge Resetn) begin
 					? S_M2_CTCS_LI_READ_buffer_row : S_M2_CTCS_CALC_B_ROW;
 			end
 			S_M2_CTCS_CALC_B_ROW: begin
-				matrix_A_row[7] <= matrix_A_val[1];
-				matrix_A_row[6] <= matrix_A_val[0];
-				matrix_A_row[5] <= matrix_A_val[7];
-				matrix_A_row[4] <= matrix_A_val[6];
-				matrix_A_row[3] <= matrix_A_val[5];
-				matrix_A_row[2] <= matrix_A_val[4];
-				matrix_A_row[1] <= matrix_A_val[3];
-				matrix_A_row[0] <= matrix_A_val[2];
+				matrix_A_row[7] <= matrix_A_row[1];
+				matrix_A_row[6] <= matrix_A_row[0];
+				matrix_A_row[5] <= matrix_A_row[7];
+				matrix_A_row[4] <= matrix_A_row[6];
+				matrix_A_row[3] <= matrix_A_row[5];
+				matrix_A_row[2] <= matrix_A_row[4];
+				matrix_A_row[1] <= matrix_A_row[3];
+				matrix_A_row[0] <= matrix_A_row[2];
 				CTCS_B_w_en <= 1'd0;
 
+				if(B_i == 4'd7) begin
+					if(FS_done) begin
+						CS_start <= 1'd1;
+					end else begin
+						CT_start <= 1'd1;
+					end
+				end
 				// starting B_j 5 buffering the values for the next row calculations
 				if((B_j == 4'd5 && A_i > 4'd0) || (B_j == 4'd6) || (B_j == 4'd7 && A_i < 4'd2)) begin
 					CTCS_A0_read_address <= CTCS_A0_read_address + 6'd1;
@@ -512,24 +523,37 @@ always @(posedge Clock or negedge Resetn) begin
 
 			end
 			S_M2_CTCS_CALC_B_NEXT_ROW: begin
-				matrix_A_row[7] <= matrix_A_val[1];
-				matrix_A_row[6] <= matrix_A_val[0];
-				matrix_A_row[5] <= matrix_A_val[7];
-				matrix_A_row[4] <= matrix_A_val[6];
-				matrix_A_row[3] <= matrix_A_val[5];
-				matrix_A_row[2] <= matrix_A_val[4];
-				matrix_A_row[1] <= matrix_A_val[3];
-				matrix_A_row[0] <= matrix_A_val[2];
 
-				if(B_j == 4'd7) begin
+				if(B_j == 4'd7 && B_i == 4'd7) begin
+					if(FS_done) begin
+						CT_done <= 1'd1;
+						CS_start <= 1'd0;
+						CS_done <= 1'd0;
+					end else begin
+						CS_done <= 1'd1
+						CT_start <= 1'd0
+						CT_done <= 1'd0;
+					end
+					CTCS_B_write_address <= CTCS_B_write_address;
+				end else if(B_j == 4'd7) begin
+					matrix_A_row <= nxt_matrix_A_row;
 					B_i <= B_i + 4'd1;
 					B_j <= 4'd0;
+					CTCS_B_write_address <= CTCS_B_write_init_address + B_i;
 				end else begin
+					matrix_A_row[7] <= matrix_A_row[1];
+					matrix_A_row[6] <= matrix_A_row[0];
+					matrix_A_row[5] <= matrix_A_row[7];
+					matrix_A_row[4] <= matrix_A_row[6];
+					matrix_A_row[3] <= matrix_A_row[5];
+					matrix_A_row[2] <= matrix_A_row[4];
+					matrix_A_row[1] <= matrix_A_row[3];
+					matrix_A_row[0] <= matrix_A_row[2];
 					B_j <= B_j + 4'd1
+					CTCS_B_write_address <= CTCS_B_write_address + 7'd8 + B_i;
 				end
 
 				CTCS_B_w_en <= 1'd1;
-				CTCS_B_write_address <= CTCS_B_write_address + 7'd8 + B_i;
 				CTCS_B_write_data <= temp_B_val_0;
 				
 				A_i <= A_i + 4'd2;
