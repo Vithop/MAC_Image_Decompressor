@@ -77,7 +77,8 @@ typedef enum logic [3:0]{
 	S_M2_FS_LO_READ_BLOCK0,
 	S_M2_FS_LO_READ_BLOCK1,
 	S_M2_FS_LO_READ_BLOCK2,
-	S_M2_FS_WAIT
+	S_M2_FS_WAIT,
+	S_M2_FS_DONE
 } Milestone2_FS_state_type;
 
 typedef enum logic [3:0]{

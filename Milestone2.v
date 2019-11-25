@@ -161,6 +161,8 @@ longint Op2;
 longint Op3;
 longint Op4;
 
+
+
 assign next_row_preIDCT = (Reading_Y_flag) ? 18'd320 : 18'd160;
 assign next_row_postIDCT = (Reading_Y_flag) ? 18'd160 : 18'd80;
 assign Reading_Y_flag = (block_index >= 18'd153600) ? 1'b0 : 1'b1;
@@ -307,21 +309,18 @@ always @(posedge Clock or negedge Resetn) begin
 				write_data0_b <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK2:begin
-				M2_FS_state <= S_M2_FS_WAIT;
+				M2_FS_state <= (SRAM_address == 18'd230399)? S_M2_FS_DONE: S_M2_FS_WAIT;
 				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
-				block_index <= (((block_index + 18'd8)%18'd320) == 0)? FS_SRAM_address + 18'd1:block_index + 18'd8;
+				block_index <= (((block_index + 18'd8)%next_row_preIDCT) == 0)? FS_SRAM_address + 18'd1:block_index + 18'd8;
 				FS_done <= 1'b1;
 			end
 			S_M2_FS_WAIT:begin
-				if (SRAM_address == 18'd230399) begin
-					M2_FS_state <= S_M2_FS_IDLE;
-				end else if (CT_done) begin
+				if (CT_done) begin
 					FS_done <= 1'b0;
 					preIDCT_i <= 4'd1;
 					preIDCT_j <= 4'd0;
 					row_address <= 18'd0;
-					block_index <= init_PreIDCT_address;
 					FS_DP_write_enable <= 1'd0;
 					FS_DP_address <=  6'd0;
 					FS_SRAM_address <= block_index + preIDCT_i + row_address;
@@ -329,6 +328,9 @@ always @(posedge Clock or negedge Resetn) begin
 				end else begin
 					M2_FS_state <= S_M2_FS_WAIT;
 				end
+			end
+			S_M2_FS_DONE:begin
+				M2_FS_state <= (SRAM_address == 18'd76799) && (SRAM_we_n ==  1'b0) ? S_M2_FS_IDLE:S_M2_FS_DONE ;
 			end
 			default: M2_FS_state <= S_M2_FS_IDLE;
 		endcase
