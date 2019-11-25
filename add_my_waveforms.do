@@ -17,7 +17,7 @@ add wave uut/M2_unit/M2_WS_state
 add wave uut/M2_unit/M2_CTCS_state
 add wave uut/M2_unit/FS_done
 add wave uut/M2_unit/CS_done
-add wave uut/M2_unit/M2_CTCS_state
+add wave uut/M2_unit/CT_done
 add wave -divider {DP RAM 0}
 add wave -decimal uut/M2_unit/DP_address0_a
 add wave -decimal uut/M2_unit/DP_address0_b
@@ -33,7 +33,7 @@ add wave -decimal uut/M2_unit/DP_address1_b
 add wave uut/M2_unit/write_enable0_a
 add wave uut/M2_unit/write_enable0_b
 add wave -decimal uut/M2_unit/write_data1_a
-add wave -decimal uut/M2_unit/write_data1_b
+#add wave -decimal uut/M2_unit/write_data1_b
 add wave -decimal uut/M2_unit/read_data1_a
 add wave -decimal uut/M2_unit/read_data1_b
 
