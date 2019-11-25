@@ -1,10 +1,11 @@
 
 
 # add waves to waveform
-add wave uut/M1_unit/Enable
-add wave Clock_50
-add wave uut/top_state
-add wave uut/M1_unit/M1_state
+# add wave uut/M1_unit/Enable
+# add wave Clock_50
+# add wave uut/top_state
+# add wave uut/M1_unit/M1_state
+
 add wave -divider {SRAM states}
 add wave uut/SRAM_we_n
 add wave -unsigned uut/SRAM_address
@@ -38,7 +39,7 @@ add wave -decimal uut/M2_unit/write_data0_b
 # add wave -decimal uut/M2_unit/read_data0_a
 # add wave -decimal uut/M2_unit/read_data0_b
 
-# add wave -divider {DP RAM 1}
+add wave -divider {DP RAM 1}
 # add wave -unsigned uut/M2_unit/DP_address1_a
 # add wave -unsigned uut/M2_unit/DP_address1_b
 # add wave uut/M2_unit/write_enable1_a
@@ -49,8 +50,10 @@ add wave -decimal uut/M2_unit/write_data1_a
 # add wave -decimal uut/M2_unit/read_data1_b
 
 add wave -divider {Calculations}
-add wave -decimal uut/M2_unit/CTCS_B_write_data
+add wave -unsigned uut/M2_unit/CTCS_A0_read_address
+add wave -unsigned uut/M2_unit/CTCS_B_write_address
 add wave -decimal uut/M2_unit/CTCS_A0_read_data
+add wave -decimal uut/M2_unit/CTCS_B_write_data
 add wave -decimal uut/M2_unit/matrix_A_row
 add wave -decimal uut/M2_unit/nxt_matrix_A_row
 add wave -decimal uut/M2_unit/temp_B_val_0
@@ -64,10 +67,10 @@ add wave -decimal uut/M2_unit/Op3
 add wave -decimal uut/M2_unit/Op4
 add wave -decimal uut/M2_unit/A_i
 # add wave -decimal uut/M2_unit/A_j
-add wave -decimal uut/M2_unit/Ic0
-add wave -decimal uut/M2_unit/Jc0
-add wave -decimal uut/M2_unit/Ic1
-add wave -decimal uut/M2_unit/Jc1
+# add wave -decimal uut/M2_unit/Ic0
+# add wave -decimal uut/M2_unit/Jc0
+# add wave -decimal uut/M2_unit/Ic1
+# add wave -decimal uut/M2_unit/Jc1
 add wave -decimal uut/M2_unit/B_i
 add wave -decimal uut/M2_unit/B_j
 
