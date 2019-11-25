@@ -230,7 +230,7 @@ always @(posedge CLOCK_50_I or negedge resetn) begin
 			end
 			`ifdef SIMULATION
 				if(UART_timer ==26'd15) begin
-					top_state <= S_ENABLE_M1;
+					top_state <= S_ENABLE_M2;
 				end
 			`endif
 		end

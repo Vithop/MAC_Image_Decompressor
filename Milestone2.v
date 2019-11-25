@@ -530,8 +530,8 @@ always @(posedge Clock or negedge Resetn) begin
 						CS_start <= 1'd0;
 						CS_done <= 1'd0;
 					end else begin
-						CS_done <= 1'd1
-						CT_start <= 1'd0
+						CS_done <= 1'd1;
+						CT_start <= 1'd0;
 						CT_done <= 1'd0;
 					end
 					CTCS_B_write_address <= CTCS_B_write_address;
@@ -549,7 +549,7 @@ always @(posedge Clock or negedge Resetn) begin
 					matrix_A_row[2] <= matrix_A_row[4];
 					matrix_A_row[1] <= matrix_A_row[3];
 					matrix_A_row[0] <= matrix_A_row[2];
-					B_j <= B_j + 4'd1
+					B_j <= B_j + 4'd1;
 					CTCS_B_write_address <= CTCS_B_write_address + 7'd8 + B_i;
 				end
 

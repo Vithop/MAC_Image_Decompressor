@@ -19,6 +19,11 @@ vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET VGA_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET PB_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION SRAM_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION Milestone1.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION Milestone2.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION Milestone2.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION get_c_values.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION dual_port_RAM0.v
+vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION dual_port_RAM1.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET tb_SRAM_Emulator.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET +define+SIMULATION UART_Receive_Controller.v
 vlog -sv -work rtl_work +define+DISABLE_DEFAULT_NET VGA_SRAM_interface.v
