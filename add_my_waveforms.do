@@ -3,16 +3,45 @@
 # add waves to waveform
 add wave uut/M1_unit/Enable
 add wave Clock_50
-add wave -divider {state of milestone 1}
 add wave uut/top_state
 add wave uut/SRAM_we_n
+add wave -unsigned uut/SRAM_address
 add wave -decimal uut/SRAM_write_data
 add wave -decimal uut/SRAM_read_data
-
-
+# Milestone 2 waves 
+#add wave -divider {state of milestone 2}
+add wave uut/M2_unit/M2_FS_state
+add wave uut/M2_unit/M2_WS_state
+add wave uut/M2_unit/M2_CTCS_state
+#add wave -divider {DP RAM 0}
+add wave -decimal uut/M2_unit/DP_address0_a
+add wave -decimal uut/M2_unit/DP_address0_b
+add wave uut/M2_unit/write_enable0_a
+add wave uut/M2_unit/write_enable0_b
+add wave -decimal uut/M2_unit/write_data0_a
+add wave -decimal uut/M2_unit/write_data0_b
+add wave -decimal uut/M2_unit/read_data0_a
+add wave -decimal uut/M2_unit/read_data0_b
+#add wave -divider {DP RAM 1}
+add wave -decimal uut/M2_unit/DP_address1_a
+add wave -decimal uut/M2_unit/DP_address1_b
+add wave uut/M2_unit/write_enable0_a
+add wave uut/M2_unit/write_enable0_b
+add wave -decimal uut/M2_unit/write_data1_a
+add wave -decimal uut/M2_unit/write_data1_b
+add wave -decimal uut/M2_unit/read_data1_a
+add wave -decimal uut/M2_unit/read_data1_b
+add wave uut/M2_unit/
+add wave uut/M2_unit/
+add wave uut/M2_unit/
+add wave uut/M2_unit/
+add wave uut/M2_unit/
+add wave uut/M2_unit/
+add wave uut/M2_unit/
 
 
 # Milestone 1 waves 
+#add wave -divider {state of milestone 1}
 # add wave uut/M1_unit/M1_state
 # add wave -unsigned uut/SRAM_address
 # add wave -divider {counters for milestone 1}

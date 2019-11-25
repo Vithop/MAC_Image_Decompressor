@@ -38,18 +38,18 @@ parameter intit_Y_address = 18'd0,
 
 
 logic [2:0] Ic0, Jc0;
-int matrix_c_val0;
+int matrix_C_val0;
 get_c_values get_c_values_inst0(
 	.i(Ic0),
 	.j(Jc0),
-	.C_values(matrix_c_val0),
+	.C_values(matrix_C_val0)
 	);
 logic [2:0] Ic1, Jc1;
-int matrix_c_val1;
+int matrix_C_val1;
 get_c_values get_c_values_inst1(
 	.i(Ic1),
 	.j(Jc1),
-	.C_values(matrix_c_val1),
+	.C_values(matrix_C_val1)
 	);
 
 
@@ -229,8 +229,6 @@ always @(posedge Clock or negedge Resetn) begin
 		FS_SRAM_address <= 16'd0;
 
 		block_index <= init_PreIDCT_address;
-		A_i <= 4'd0;
-		A_j <= 4'd0;
 
 		FS_DP_address <= 7'd0;
 		write_data0_b <= 32'd0;
@@ -264,7 +262,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_FS_READ_BLOCK_ROW:begin
 				FS_SRAM_address <= block_index + preIDCT_i + row_address;
-				FS_DP_address <= FS_DP_address + 1;
+				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
 				if (preIDCT_i < 4'd6) begin
 				 	M2_FS_state <= S_M2_FS_READ_BLOCK_ROW;
@@ -273,7 +271,7 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M2_FS_NEXT_ROW:begin
-				FS_DP_address <= FS_DP_address + 1;
+				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
 				preIDCT_i <= (preIDCT_i == 4'd7)? 4'd0: preIDCT_i + 4'd1;
 				if (preIDCT_j < 4'd7) begin
@@ -289,17 +287,17 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_FS_LO_READ_BLOCK0:begin
 				M2_FS_state <= S_M2_FS_LO_READ_BLOCK0;
-				FS_DP_address <= FS_DP_address + 1;
+				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK1:begin
 				M2_FS_state <= S_M2_FS_LO_READ_BLOCK2;
-				FS_DP_address <= FS_DP_address + 1;
+				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
 			end
 			S_M2_FS_LO_READ_BLOCK2:begin
 				M2_FS_state <= S_M2_FS_WAIT;
-				FS_DP_address <= FS_DP_address + 1;
+				FS_DP_address <= FS_DP_address + 6'd1;
 				write_data0_b <= SRAM_read_data;
 				block_index <= (((block_index + 18'd8)%18'd320) == 0)? FS_SRAM_address + 18'd1:block_index + 18'd8;
 				FS_done <= 1'b1;
@@ -444,7 +442,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_CTCS_LI_READ_DELAY_2: begin
 				CTCS_A0_read_address <= CTCS_A0_read_address + 6'd1;
-				M2_CTCS_state <= S_M2_CTCS_LI_READ_DELAY_3;
+				M2_CTCS_state <= S_M2_CTCS_LI_READ_buffer_row;
 			end
 			S_M2_CTCS_LI_READ_buffer_row: begin
 				matrix_A_row[7] <= CTCS_A0_read_data;
@@ -464,14 +462,14 @@ always @(posedge Clock or negedge Resetn) begin
 					? S_M2_CTCS_LI_READ_buffer_row : S_M2_CTCS_CALC_B_ROW;
 			end
 			S_M2_CTCS_CALC_B_ROW: begin
-				matrix_A_row[7] <= matrix_A_val[1];
-				matrix_A_row[6] <= matrix_A_val[0];
-				matrix_A_row[5] <= matrix_A_val[7];
-				matrix_A_row[4] <= matrix_A_val[6];
-				matrix_A_row[3] <= matrix_A_val[5];
-				matrix_A_row[2] <= matrix_A_val[4];
-				matrix_A_row[1] <= matrix_A_val[3];
-				matrix_A_row[0] <= matrix_A_val[2];
+				matrix_A_row[7] <= matrix_A_row[1];
+				matrix_A_row[6] <= matrix_A_row[0];
+				matrix_A_row[5] <= matrix_A_row[7];
+				matrix_A_row[4] <= matrix_A_row[6];
+				matrix_A_row[3] <= matrix_A_row[5];
+				matrix_A_row[2] <= matrix_A_row[4];
+				matrix_A_row[1] <= matrix_A_row[3];
+				matrix_A_row[0] <= matrix_A_row[2];
 
 				// starting B_j 5 buffering the values for the next row calculations
 				if((B_j == 4'd5 && A_i > 4'd0) || (B_j == 4'd6) || (B_j == 4'd7 && A_i < 4'd2)) begin
@@ -508,14 +506,14 @@ always @(posedge Clock or negedge Resetn) begin
 
 			end
 			S_M2_CTCS_CALC_B_NEXT_ROW: begin
-				matrix_A_row[7] <= matrix_A_val[1];
-				matrix_A_row[6] <= matrix_A_val[0];
-				matrix_A_row[5] <= matrix_A_val[7];
-				matrix_A_row[4] <= matrix_A_val[6];
-				matrix_A_row[3] <= matrix_A_val[5];
-				matrix_A_row[2] <= matrix_A_val[4];
-				matrix_A_row[1] <= matrix_A_val[3];
-				matrix_A_row[0] <= matrix_A_val[2];
+				matrix_A_row[7] <= matrix_A_row[1];
+				matrix_A_row[6] <= matrix_A_row[0];
+				matrix_A_row[5] <= matrix_A_row[7];
+				matrix_A_row[4] <= matrix_A_row[6];
+				matrix_A_row[3] <= matrix_A_row[5];
+				matrix_A_row[2] <= matrix_A_row[4];
+				matrix_A_row[1] <= matrix_A_row[3];
+				matrix_A_row[0] <= matrix_A_row[2];
 
 				CTCS_B_w_en <= 1'd1;
 				CTCS_B_write_address <= 

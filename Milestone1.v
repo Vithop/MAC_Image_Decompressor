@@ -91,10 +91,10 @@ assign G_temp = (result_a - result_b - result_c);
 
 
 //Debuging values from SRAM READ
-logic [7:0] Read_byte1;
-logic [7:0] Read_byte2;
-assign Read_byte1 = SRAM_read_data[7:0];
-assign Read_byte2 = SRAM_read_data[15:8];
+// logic [7:0] Read_byte1;
+// logic [7:0] Read_byte2;
+// assign Read_byte1 = SRAM_read_data[7:0];
+// assign Read_byte2 = SRAM_read_data[15:8];
 
 always_comb begin
 	if(M1_state == S_M1_CALC_V_PRIME || M1_state == S_M1_LI_CALC_V || M1_state == S_M1_LO_WRITE_BR)begin

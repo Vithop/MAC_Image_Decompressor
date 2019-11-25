@@ -39,6 +39,8 @@ set_global_assignment -name VERILOG_FILE MAC_Image_Decompressor.v
 set_global_assignment -name VERILOG_FILE Milestone1.v
 set_global_assignment -name VERILOG_FILE Milestone2.v
 set_global_assignment -name VERILOG_FILE C_values.v
+set_global_assignment -name VERILOG_FILE dual_port_RAM0.v
+set_global_assignment -name VERILOG_FILE dual_port_RAM1.v
 set_global_assignment -name VERILOG_FILE SRAM_Controller.v
 set_global_assignment -name VERILOG_FILE VGA_Controller.v
 set_global_assignment -name VERILOG_FILE PB_Controller.v
