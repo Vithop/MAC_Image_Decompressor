@@ -44,6 +44,10 @@ add wave -decimal uut/M2_unit/read_data1_b
 add wave -divider {Calculations}
 add wave -decimal uut/M2_unit/CTCS_B_write_data
 add wave -decimal uut/M2_unit/temp_B_val_0
+add wave -decimal uut/M2_unit/A_i
+add wave -decimal uut/M2_unit/A_j
+add wave -decimal uut/M2_unit/B_i
+add wave -decimal uut/M2_unit/B_j
 
 
 

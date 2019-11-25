@@ -215,7 +215,7 @@ assign result_a = {temp_a[31:0]};
 assign result_b = {temp_b[31:0]};
 
 always_comb begin
-	if(M2_CTCS_state == S_M2_CTCS_LI_init || M2_CTCS_state == S_M2_CTCS_LI_READ_DELAY_1)begin
+	if(M2_CTCS_state == S_M2_CTCS_CALC_B_ROW || M2_CTCS_state == S_M2_CTCS_CALC_B_NEXT_ROW)begin
 		Op1 = matrix_A_row[0];
 		Op2 = matrix_C_val0;
 		Op3 = matrix_A_row[1];
