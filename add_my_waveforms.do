@@ -21,31 +21,46 @@ add wave uut/M2_unit/CT_done
 add wave uut/M2_unit/CS_start
 add wave uut/M2_unit/CT_start
 
-add wave -divider {DP RAM 0}
-add wave -decimal uut/M2_unit/DP_address0_a
-add wave -decimal uut/M2_unit/DP_address0_b
-add wave uut/M2_unit/write_enable0_a
-add wave uut/M2_unit/write_enable0_b
-add wave -decimal uut/M2_unit/write_data0_a
-add wave -decimal uut/M2_unit/write_data0_b
-add wave -decimal uut/M2_unit/read_data0_a
-add wave -decimal uut/M2_unit/read_data0_b
+# add wave -divider {DP RAM 0}
+# add wave -decimal uut/M2_unit/DP_address0_a
+# add wave -decimal uut/M2_unit/DP_address0_b
+# add wave uut/M2_unit/write_enable0_a
+# add wave uut/M2_unit/write_enable0_b
+# add wave -decimal uut/M2_unit/write_data0_a
+# add wave -decimal uut/M2_unit/write_data0_b
+# add wave -decimal uut/M2_unit/read_data0_a
+# add wave -decimal uut/M2_unit/read_data0_b
 
-add wave -divider {DP RAM 1}
-add wave -decimal uut/M2_unit/DP_address1_a
-add wave -decimal uut/M2_unit/DP_address1_b
-add wave uut/M2_unit/write_enable1_a
-add wave uut/M2_unit/write_enable1_b
-add wave -decimal uut/M2_unit/write_data1_a
+# add wave -divider {DP RAM 1}
+# add wave -decimal uut/M2_unit/DP_address1_a
+# add wave -decimal uut/M2_unit/DP_address1_b
+# add wave uut/M2_unit/write_enable1_a
+# add wave uut/M2_unit/write_enable1_b
+# add wave -decimal uut/M2_unit/write_data1_a
 # add wave -decimal uut/M2_unit/write_data1_b
-add wave -decimal uut/M2_unit/read_data1_a
-add wave -decimal uut/M2_unit/read_data1_b
+# add wave -decimal uut/M2_unit/read_data1_a
+# add wave -decimal uut/M2_unit/read_data1_b
 
 add wave -divider {Calculations}
 add wave -decimal uut/M2_unit/CTCS_B_write_data
+add wave -decimal uut/M2_unit/CTCS_A0_read_data
+add wave -decimal uut/M2_unit/matrix_A_row
+add wave -decimal uut/M2_unit/nxt_matrix_A_row
 add wave -decimal uut/M2_unit/temp_B_val_0
+add wave -decimal uut/M2_unit/result_a
+add wave -decimal uut/M2_unit/result_b
+add wave -decimal uut/M2_unit/temp_a
+add wave -decimal uut/M2_unit/temp_b
+add wave -decimal uut/M2_unit/Op1
+add wave -decimal uut/M2_unit/Op2
+add wave -decimal uut/M2_unit/Op3
+add wave -decimal uut/M2_unit/Op4
 add wave -decimal uut/M2_unit/A_i
 add wave -decimal uut/M2_unit/A_j
+add wave -decimal uut/M2_unit/Ic0
+add wave -decimal uut/M2_unit/Jc0
+add wave -decimal uut/M2_unit/Ic1
+add wave -decimal uut/M2_unit/Jc1
 add wave -decimal uut/M2_unit/B_i
 add wave -decimal uut/M2_unit/B_j
 

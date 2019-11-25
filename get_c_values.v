@@ -14,9 +14,9 @@ module get_c_values (
 	output int C_values
 );
 always_comb begin
-	case(i)
+	case(j)
 		8'd0:begin
-			case(j)
+			case(i)
 				8'd0 : 	C_values = 1448;
 				8'd1 : 	C_values = 1448;
 				8'd2 : 	C_values = 1448;
@@ -28,7 +28,7 @@ always_comb begin
 			endcase	
 		end
 		8'd1:begin
-			case(j)
+			case(i)
 				8'd0 : 	C_values = 2008;
 				8'd1 : 	C_values = 1702;
 				8'd2:  C_values = 1137;
@@ -40,7 +40,7 @@ always_comb begin
 			endcase
 		end
 		8'd2:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 1892;
 				8'd1:  C_values = 783;
 				8'd2:  C_values = -783;
@@ -52,7 +52,7 @@ always_comb begin
 			endcase			
 		end
 		8'd3:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 1702;
 				8'd1:  C_values = -399;
 				8'd2:  C_values = -2008;
@@ -64,7 +64,7 @@ always_comb begin
 			endcase
 		end
 		8'd4:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 1448;
 				8'd1:  C_values = -1448;
 				8'd2:  C_values = -1448;
@@ -76,7 +76,7 @@ always_comb begin
 			endcase
 		end
 		8'd5:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 1137;
 				8'd1:  C_values = -2008;
 				8'd2:  C_values = 399;
@@ -88,7 +88,7 @@ always_comb begin
 			endcase
 		end
 		8'd6:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 783;
 				8'd1:  C_values = -1892;
 				8'd2:  C_values = 1892;
@@ -100,7 +100,7 @@ always_comb begin
 			endcase
 		end
 		8'd7:begin
-			case(j)
+			case(i)
 				8'd0:  C_values = 399;
 				8'd1:  C_values = -1137;
 				8'd2:  C_values = 1702;
