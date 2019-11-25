@@ -123,8 +123,8 @@ logic CT_start;
 	// General Matrix A that will represent S' or T
 logic [3:0] A_i;
 logic [3:0] A_j;
-logic [15:0] matrix_A_row [7:0];
-logic [15:0] nxt_matrix_A_row [7:0];
+logic [31:0] matrix_A_row [7:0];
+logic [31:0] nxt_matrix_A_row [7:0];
 logic [6:0] last_read_address;
 // logic [7:0] matrix_A_val_2;
 
