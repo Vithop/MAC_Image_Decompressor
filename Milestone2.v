@@ -85,7 +85,7 @@ dual_port_RAM1 dual_port_RAM_inst1 (
 	.address_b ( DP_address1_b ),
 	.clock ( Clock ),
 	.data_a ( write_data1_a ),
-	.data_b ( 31'b0 ),
+	.data_b ( 32'b0 ),
 	.wren_a ( write_enable1_a ),
 	.wren_b ( write_enable1_b ),
 	.q_a ( read_data1_a ),
@@ -182,7 +182,7 @@ always_comb begin
 
 		CTCS_A0_read_data = (CS_start) ? read_data1_b : read_data0_a;
 		write_data0_a = 32'd0;
-		write_data1_a = CTCS_B_write_data;
+		write_data1_a = CTCS_B_write_data >>> 8;
 		CTCS_B_write_init_address <= 7'd0;
 
 		write_enable0_a = (CS_start) ? 1'd0 : CTCS_A0_w_en;
@@ -200,7 +200,8 @@ always_comb begin
 		DP_address1_b = 7'd0;// nobody :(
 
 		CTCS_A0_read_data = (CT_start) ? read_data0_b : read_data1_a;
-		write_data0_a = CTCS_B_write_data;
+		write_data0_a = (CTCS_B_write_data[31] == 1'd1) ? 8'd0 
+						: |CTCS_B_write_data[30:24] ? 8'd255 : CTCS_B_write_data >>> 16;
 		write_data1_a = 32'd0;
 		CTCS_B_write_init_address <= 7'd64;
 
@@ -507,7 +508,7 @@ always @(posedge Clock or negedge Resetn) begin
 				if(B_i == 4'd7) begin
 					if (CTCS_LeadINFLAG) begin
 						CS_start <= 1'b1;
-						CTCS_LeadINFLAG <= 1'b1;
+						CTCS_LeadINFLAG <= 1'b0;
 					end else if (CT_done) begin
 						CT_start <= 1'b1;
 						CS_start <= 1'b0;
