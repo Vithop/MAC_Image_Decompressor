@@ -21,9 +21,16 @@ add wave uut/M2_unit/CT_done
 add wave uut/M2_unit/CS_start
 add wave uut/M2_unit/CT_start
 
+# add wave -divider {Fetch S values}
+# add wave -unsigned uut/M2_unit/block_index
+# add wave -decimal uut/M2_unit/preIDCT_i
+# add wave -decimal uut/M2_unit/preIDCT_j
+# add wave -decimal uut/M2_unit/row_address
+# add wave -decimal uut/M2_unit/Reading_Y_flag
+
 # add wave -divider {DP RAM 0}
-# add wave -decimal uut/M2_unit/DP_address0_a
-# add wave -decimal uut/M2_unit/DP_address0_b
+# add wave -unsigned uut/M2_unit/DP_address0_a
+# add wave -unsigned uut/M2_unit/DP_address0_b
 # add wave uut/M2_unit/write_enable0_a
 # add wave uut/M2_unit/write_enable0_b
 # add wave -decimal uut/M2_unit/write_data0_a
@@ -32,8 +39,8 @@ add wave uut/M2_unit/CT_start
 # add wave -decimal uut/M2_unit/read_data0_b
 
 # add wave -divider {DP RAM 1}
-# add wave -decimal uut/M2_unit/DP_address1_a
-# add wave -decimal uut/M2_unit/DP_address1_b
+# add wave -unsigned uut/M2_unit/DP_address1_a
+# add wave -unsigned uut/M2_unit/DP_address1_b
 # add wave uut/M2_unit/write_enable1_a
 # add wave uut/M2_unit/write_enable1_b
 # add wave -decimal uut/M2_unit/write_data1_a
