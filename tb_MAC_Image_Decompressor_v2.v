@@ -35,13 +35,13 @@ you will get false errors, so use the original testbench instead.
 
 // file for comparison
 // to test milestone 2 independently, use the .sram_d1 file to check the output
-`define VERIFICATION_FILE_NAME "cat.sram_d0"
+`define VERIFICATION_FILE_NAME "cat.sram_d1"
 
 //// for milestone 1
-`define INPUT_FILE_NAME "cat.sram_d1"
+//`define INPUT_FILE_NAME "cat.sram_d1"
 
 // for milestone 2
-`define INPUT_FILE_NAME "motorcycle.sram_d2"
+`define INPUT_FILE_NAME "cat.sram_d2"
 
 //// for milestone 3 (completed MAC_Image_Decompressor)
 //`define INPUT_FILE_NAME "motorcycle.mic13”
@@ -190,16 +190,7 @@ begin
 	//NOTE: this is for milestone 1, in different milestones we will be
 	//writing to different regions so modify as needed
 	// Milestone 1 loop
-	for (i=146944; i<262144; i=i+1) begin
-		if (SRAM_ARRAY_write_count[i]==0) begin
-			if (error_count < `MAX_MISMATCHES) begin
-				$write("error: did not write to location %d (%x hex)\n", i, i);
-				error_count = error_count + 1;
-			end
-		end
-	end
-	// Milestone 2 loop might be wrong
-	// for (i=76800; i<230399; i=i+1) begin
+	// for (i=146944; i<262144; i=i+1) begin
 	// 	if (SRAM_ARRAY_write_count[i]==0) begin
 	// 		if (error_count < `MAX_MISMATCHES) begin
 	// 			$write("error: did not write to location %d (%x hex)\n", i, i);
@@ -207,6 +198,15 @@ begin
 	// 		end
 	// 	end
 	// end
+	//Milestone 2 loop might be wrong
+	for (i=0; i<76799; i=i+1) begin
+		if (SRAM_ARRAY_write_count[i]==0) begin
+			if (error_count < `MAX_MISMATCHES) begin
+				$write("error: did not write to location %d (%x hex)\n", i, i);
+				error_count = error_count + 1;
+			end
+		end
+	end
 
 end
 endtask

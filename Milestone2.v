@@ -75,7 +75,7 @@ dual_port_RAM0 dual_port_RAM_inst0 (
 
 logic [6:0] DP_address1_a, DP_address1_b;
 logic [31:0] write_data1_a;
-logic [31:0] write_data1_b;
+//logic [31:0] write_data1_b; // not used
 logic write_enable1_a;
 logic write_enable1_b;
 logic [31:0] read_data1_a;
@@ -85,7 +85,7 @@ dual_port_RAM1 dual_port_RAM_inst1 (
 	.address_b ( DP_address1_b ),
 	.clock ( Clock ),
 	.data_a ( write_data1_a ),
-	.data_b ( write_data1_b ),
+	.data_b ( 31'b0 ),
 	.wren_a ( write_enable1_a ),
 	.wren_b ( write_enable1_b ),
 	.q_a ( read_data1_a ),
