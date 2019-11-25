@@ -421,7 +421,7 @@ always @(posedge Clock or negedge Resetn) begin
 		Jc0 <= 3'd0;
 		Ic1 <= 3'd0;
 		Jc1 <= 3'd1;
-
+		temp_B_val_0 <= 32'd0;
 		CTCS_A0_read_address <= 7'd0;
 		CTCS_B_write_address <= 7'd0;
 		

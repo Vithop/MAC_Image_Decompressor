@@ -20,6 +20,7 @@ add wave uut/M2_unit/CS_done
 add wave uut/M2_unit/CT_done
 add wave uut/M2_unit/CS_start
 add wave uut/M2_unit/CT_start
+
 add wave -divider {DP RAM 0}
 add wave -decimal uut/M2_unit/DP_address0_a
 add wave -decimal uut/M2_unit/DP_address0_b
@@ -29,6 +30,7 @@ add wave -decimal uut/M2_unit/write_data0_a
 add wave -decimal uut/M2_unit/write_data0_b
 add wave -decimal uut/M2_unit/read_data0_a
 add wave -decimal uut/M2_unit/read_data0_b
+
 add wave -divider {DP RAM 1}
 add wave -decimal uut/M2_unit/DP_address1_a
 add wave -decimal uut/M2_unit/DP_address1_b
@@ -38,6 +40,11 @@ add wave -decimal uut/M2_unit/write_data1_a
 # add wave -decimal uut/M2_unit/write_data1_b
 add wave -decimal uut/M2_unit/read_data1_a
 add wave -decimal uut/M2_unit/read_data1_b
+
+add wave -divider {Calculations}
+add wave -decimal uut/M2_unit/CTCS_B_write_data
+add wave -decimal uut/M2_unit/temp_B_val_0
+
 
 
 # Milestone 1 waves 
