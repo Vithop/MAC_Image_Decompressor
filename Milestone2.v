@@ -136,7 +136,7 @@ logic [31:0] temp_B_val_1;
 
 
 // Writing to SRAM Logic
-logic [17:0] YUV_block_address;
+logic [17:0] YUV_block_index;
 logic [2:0] YUV_i;
 logic [2:0] YUV_j;
 logic [7:0] YUV_buff;
@@ -347,7 +347,7 @@ always @(posedge Clock or negedge Resetn) begin
 		WS_DP_address <= 7'd64;
 		WS_DP_write_enable <= 1'b0;
 
-		YUV_block_address <= 17'd0;
+		YUV_block_index <= 17'd0;
 		YUV_row_address <= 17'd0;
 		YUV_buff <= 8'd0;
 
@@ -355,7 +355,13 @@ always @(posedge Clock or negedge Resetn) begin
 	end else begin
 		case(M2_WS_state)
 			S_M2_WS_WAIT:begin
-				M2_WS_state <= (CS_done)? S_M2_WS_START_READ: S_M2_WS_WAIT;
+				if (CS_done) begin
+					M2_WS_state <= S_M2_WS_START_READ;
+					YUV_i <= 0;
+					YUV_j <= 0;
+					YUV_row_address <= 0;
+					WS_DP_address <= 7'd64;
+				end 
 			end
 			S_M2_WS_START_READ:begin
 				WS_DP_address <= 7'd64;
@@ -375,7 +381,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_WS_WRITE_S_ROW:begin
 				WS_DP_address <= WS_DP_address + 7'd1;
-				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
+				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
 				WS_SRAM_we_n <= 1'b0;
 				WS_SRAM_write_data <= {YUV_buff, read_data1_b[7:0]};
 				YUV_i = YUV_i + 3'd1;
@@ -383,7 +389,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_WS_WRITE_S_NEXT_ROW: begin
 				WS_DP_address <= WS_DP_address + 7'd1;
-				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
+				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
 				WS_SRAM_write_data <= {read_data1_a[7:0], read_data1_b[7:0]};
 				YUV_i <= (YUV_i == 3'd3)?3'd0: YUV_i + 3'd1;
 				if (YUV_j < 3'd3) begin
@@ -395,15 +401,15 @@ always @(posedge Clock or negedge Resetn) begin
 				end
 			end
 			S_M2_WS_WRITE_S_LO_0:begin
-				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
+				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
 				YUV_buff <= read_data1_a[7:0];
 				M2_WS_state <= S_M2_WS_WRITE_S_LO_1;
 			end
 			S_M2_WS_WRITE_S_LO_1:begin
-				WS_SRAM_address <= YUV_block_address + YUV_i + YUV_row_address;
+				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
 				WS_SRAM_write_data <= {YUV_buff, read_data1_b[7:0]};
 				YUV_i = YUV_i + 3'd1;
-				YUV_block_address <= (((YUV_block_address+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_address + 17'd4;
+				YUV_block_index <= (((YUV_block_index+17'd4) % 17'd160) == 0)? SRAM_address+17'd1: YUV_block_index + 17'd4;
 				WS_SRAM_we_n <= 1'b1;
 				M2_WS_state <= S_M2_WS_WAIT;
 			end 
