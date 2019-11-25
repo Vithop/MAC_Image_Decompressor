@@ -355,7 +355,7 @@ always @(posedge Clock or negedge Resetn) begin
 	end else begin
 		case(M2_WS_state)
 			S_M2_WS_WAIT:begin
-				if (CS_done) begin
+				if (CS_done && FS_done) begin
 					M2_WS_state <= S_M2_WS_START_READ;
 					YUV_i <= 0;
 					YUV_j <= 0;
@@ -375,20 +375,22 @@ always @(posedge Clock or negedge Resetn) begin
 				M2_WS_state <= S_M2_WS_LI_READ_S1;
 			end
 			S_M2_WS_LI_READ_S1:begin
-				WS_DP_address <= WS_DP_address + 7'd1;
+				WS_SRAM_we_n <= 1'b1;
 				YUV_buff <= read_data1_a[7:0];
-				M2_WS_state <= (YUV_i < 3'd2)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
+				WS_DP_address <= WS_DP_address + 7'd1;
+				M2_WS_state <= (YUV_i < 3'd3)? S_M2_WS_WRITE_S_ROW : S_M2_WS_WRITE_S_NEXT_ROW;
 			end
 			S_M2_WS_WRITE_S_ROW:begin
-				WS_DP_address <= WS_DP_address + 7'd1;
-				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
-				WS_SRAM_we_n <= 1'b0;
-				WS_SRAM_write_data <= {YUV_buff, read_data1_b[7:0]};
 				YUV_i = YUV_i + 3'd1;
-				M2_WS_state <= S_M2_WS_LI_READ_S1;
+				WS_SRAM_we_n <= 1'b0;
+				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
+				WS_SRAM_write_data <= {YUV_buff, read_data1_b[7:0]};
+				WS_DP_address <= WS_DP_address + 7'd1;
+				M2_WS_state <= S_M2_WS_LI_READ_S1;                                             
 			end
 			S_M2_WS_WRITE_S_NEXT_ROW: begin
 				WS_DP_address <= WS_DP_address + 7'd1;
+				WS_SRAM_we_n <= 1'b0;
 				WS_SRAM_address <= YUV_block_index + YUV_i + YUV_row_address;
 				WS_SRAM_write_data <= {read_data1_a[7:0], read_data1_b[7:0]};
 				YUV_i <= (YUV_i == 3'd3)?3'd0: YUV_i + 3'd1;

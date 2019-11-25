@@ -5,7 +5,7 @@ add wave uut/M1_unit/Enable
 add wave Clock_50
 add wave uut/top_state
 add wave uut/M1_unit/M1_state
-add wave -divider {state of milestone 2}
+add wave -divider {SRAM states}
 add wave uut/SRAM_we_n
 add wave -unsigned uut/SRAM_address
 add wave -decimal uut/SRAM_write_data
