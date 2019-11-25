@@ -417,6 +417,11 @@ always @(posedge Clock or negedge Resetn) begin
 		CTCS_A0_w_en <= 1'b0;
 		CTCS_B_w_en <= 1'b0;
 
+		CT_start <= 1'd0;
+		CT_done <= 1'd0;
+		CS_start <= 1'd0;
+		CS_done <= 1'd1;
+
 		M2_CTCS_state <= S_CTCS_wait;
 	end	else begin
 		case(M2_CTCS_state)
@@ -479,9 +484,9 @@ always @(posedge Clock or negedge Resetn) begin
 
 				if(B_i == 4'd7) begin
 					if(FS_done) begin
-						CS_start <= 1'd1;
+						CS_start <= (CS_done) 1'd1 : 1'd0;
 					end else begin
-						CT_start <= 1'd1;
+						CT_start <= (CT_done) ? 1'd1 : 1'd0;
 					end
 				end
 
@@ -523,6 +528,14 @@ always @(posedge Clock or negedge Resetn) begin
 
 			end
 			S_M2_CTCS_CALC_B_NEXT_ROW: begin
+				CTCS_B_w_en <= 1'd1;
+				CTCS_B_write_data <= temp_B_val_0;
+				
+				A_i <= A_i + 4'd2;
+				Jc0 <= Jc0 + 3'd2;
+				Jc1 <= Jc1 + 3'd2;
+				temp_B_val_0 <= result_a + result_b;
+				M2_CTCS_state <= S_M2_CTCS_CALC_B_ROW;
 
 				if(B_j == 4'd7 && B_i == 4'd7) begin
 					if(FS_done) begin
@@ -552,15 +565,6 @@ always @(posedge Clock or negedge Resetn) begin
 					B_j <= B_j + 4'd1;
 					CTCS_B_write_address <= CTCS_B_write_address + 7'd8 + B_i;
 				end
-
-				CTCS_B_w_en <= 1'd1;
-				CTCS_B_write_data <= temp_B_val_0;
-				
-				A_i <= A_i + 4'd2;
-				Jc0 <= Jc0 + 3'd2;
-				Jc1 <= Jc1 + 3'd2;
-				temp_B_val_0 <= result_a + result_b;
-				M2_CTCS_state <= S_M2_CTCS_CALC_B_ROW;
 			end
 			default: M2_CTCS_state <= S_CTCS_wait;
 		endcase

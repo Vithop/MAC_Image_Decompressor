@@ -33,7 +33,7 @@ add wave -decimal uut/M2_unit/DP_address1_b
 add wave uut/M2_unit/write_enable0_a
 add wave uut/M2_unit/write_enable0_b
 add wave -decimal uut/M2_unit/write_data1_a
-add wave -decimal uut/M2_unit/write_data1_b
+# add wave -decimal uut/M2_unit/write_data1_b
 add wave -decimal uut/M2_unit/read_data1_a
 add wave -decimal uut/M2_unit/read_data1_b
 
