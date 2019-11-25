@@ -277,8 +277,7 @@ end
 assign VGA_base_address = 18'd146944;
 
 // Give access to SRAM for UART and VGA at appropriate time
-assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) 
-						? UART_SRAM_address 
+assign SRAM_address = ((top_state == S_ENABLE_UART_RX) | (top_state == S_WAIT_UART_RX)) ? UART_SRAM_address 
 						: (top_state == S_WAIT_M1) ? M1_SRAM_address 
 						: (top_state == S_WAIT_M2) ? M2_SRAM_address 
 						: VGA_SRAM_address;
