@@ -15,6 +15,9 @@ add wave -divider {state of milestone 2}
 add wave uut/M2_unit/M2_FS_state
 add wave uut/M2_unit/M2_WS_state
 add wave uut/M2_unit/M2_CTCS_state
+add wave uut/M2_unit/FS_done
+add wave uut/M2_unit/CS_done
+add wave uut/M2_unit/M2_CTCS_state
 add wave -divider {DP RAM 0}
 add wave -decimal uut/M2_unit/DP_address0_a
 add wave -decimal uut/M2_unit/DP_address0_b
