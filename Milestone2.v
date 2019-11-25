@@ -122,7 +122,7 @@ logic CT_start;
 
 	// General Matrix A that will represent S' or T
 logic [3:0] A_i;
-logic [3:0] A_j;
+// logic [3:0] A_j;
 logic [31:0] matrix_A_row [7:0];
 logic [31:0] nxt_matrix_A_row [7:0];
 logic [6:0] last_read_address;
@@ -424,7 +424,7 @@ always @(posedge Clock or negedge Resetn) begin
 	if (~Resetn) begin
 		// reset
 		A_i <= 4'd0;
-		A_j <= 4'd0;
+		// A_j <= 4'd0;
 		B_i <= 4'd0;
 		B_j <= 4'd0;
 		Ic0 <= 3'd0;
@@ -458,7 +458,7 @@ always @(posedge Clock or negedge Resetn) begin
 				CTCS_B_w_en <= 1'b0;
 
 				A_i <= 4'd0;
-				A_j <= 4'd0;
+				// A_j <= 4'd0;
 				B_i <= 4'd0;
 				B_j <= 4'd0;
 				Ic0 <= 3'd0;
@@ -508,13 +508,12 @@ always @(posedge Clock or negedge Resetn) begin
 					if (CTCS_LeadINFLAG) begin
 						CS_start <= 1'b1;
 						CTCS_LeadINFLAG <= 1'b1;
-					end
-					if (CT_done) begin
-						CT_start <= 1'b0;
-						CS_start <= 1'b1;
-					end else begin
+					end else if (CT_done) begin
 						CT_start <= 1'b1;
 						CS_start <= 1'b0;
+					end else begin
+						CT_start <= 1'b0;
+						CS_start <= 1'b1;
 					end
 				end
 
