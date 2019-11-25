@@ -448,7 +448,7 @@ always @(posedge Clock or negedge Resetn) begin
 			end
 			S_M2_CTCS_LI_READ_DELAY_2: begin
 				CTCS_A0_read_address <= CTCS_A0_read_address + 6'd1;
-				M2_CTCS_state <= S_M2_CTCS_LI_READ_DELAY_3;
+				M2_CTCS_state <= S_M2_CTCS_LI_READ_buffer_row;
 			end
 			S_M2_CTCS_LI_READ_buffer_row: begin
 				matrix_A_row[7] <= CTCS_A0_read_data;
